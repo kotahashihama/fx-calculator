@@ -42,9 +42,8 @@
 
           <h3>レバレッジ</h3>
           <div>
-            <select name="" id="" v-model="leverage">
-              <option value="">選択してください</option>
-              <option v-for="leverage in leverages[broker]">{{ leverage }}</option>
+            <select name="" id="" v-model="leverage[broker]">
+              <option :value="leverage" v-for="leverage in leverages[broker]">{{ leverage }}</option>
             </select> 倍
           </div>
 

@@ -31,6 +31,11 @@ const vm = new Vue({
     unrealizedValue: 0,
 
     broker: 'overseas',
+    leverage: {
+      overseas: 1000,
+      japan: 25
+    },
+    balance: 0,
     standardSizes: {
       overseas: 100000,
       japan: 10000
@@ -39,7 +44,6 @@ const vm = new Vue({
       overseas: [1000, 888, 500, 200],
       japan: [25, 20, 10, 5]
     },
-    balance: 0,
 
     positions: [],
     pairs,
@@ -95,7 +99,7 @@ const vm = new Vue({
       }
     },
     leverage: function () {
-      this.leverages[broker]
+      this.leverages[broker][0]
     }
   }
 })
