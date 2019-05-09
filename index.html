@@ -121,13 +121,25 @@
 
     <div class="card">
       <div class="card-body">
-        <h2>想定レート (未実装)</h2>
+        <h2>現在レート</h2>
+        <p class="text-muted">現在のレートを入力してください。</p>
+        EURUSD: <input type="number" min="0.00001" step="0.00001" v-model="currencyInfo[0].rate" class="form-control">
+        USDJPY: <input type="number" min="0.00001" step="0.00001" v-model="currencyInfo[1].rate" class="form-control">
+        GBPUSD: <input type="number" min="0.00001" step="0.00001" v-model="currencyInfo[2].rate" class="form-control">
+        AUDUSD: <input type="number" min="0.00001" step="0.00001" v-model="currencyInfo[3].rate" class="form-control">
+        <button class="btn btn-primary">APIから取得 (未実装)</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <h2>仮定レート (未実装)</h2>
         <input type="number" min="0.00001" step="0.00001" class="form-control">
         <button class="btn btn-primary">現在レート</button>
       </div>
     </div>
 
-    <pre>{{ $data }}</pre>
+    <!-- <pre>{{ $data }}</pre> -->
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
