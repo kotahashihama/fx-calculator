@@ -66,10 +66,18 @@ const vm = new Vue({
 
         if (currencyInfo.name === 'USDJPY') {
           // ドル円の処理
-          totalPips += (currencyInfo.rateExpected - this.positions[i].entryRate) * 100
+          if (this.positions[i].action === 'buy') {
+            totalPips += (currencyInfo.rateExpected - this.positions[i].entryRate) * 100
+          } else {
+            totalPips += -(currencyInfo.rateExpected - this.positions[i].entryRate) * 100
+          }
         } else {
           // それ以外の通貨ペアの処理
-          totalPips += ((currencyInfo.rateExpected - this.positions[i].entryRate) * 100) * usdJpyInfo.rate
+          if (this.positions[i].action === 'buy') {
+            totalPips += (currencyInfo.rateExpected - this.positions[i].entryRate) * 10000
+          } else {
+            totalPips += -(currencyInfo.rateExpected - this.positions[i].entryRate) * 10000
+          }
         }
       }
 
