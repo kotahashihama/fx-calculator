@@ -119,11 +119,11 @@
       <div class="card-body">
         <h2>現在レート</h2>
         <p class="text-muted">現在のレートを入力してください。</p>
-        EURUSD: <input type="number" min="0.00001" step="0.00001" v-model="currencyInfo[0].rate" class="form-control">
-        USDJPY: <input type="number" min="0.001" step="0.001" v-model="currencyInfo[1].rate" class="form-control">
-        GBPUSD: <input type="number" min="0.00001" step="0.00001" v-model="currencyInfo[2].rate" class="form-control">
-        AUDUSD: <input type="number" min="0.00001" step="0.00001" v-model="currencyInfo[3].rate" class="form-control">
-        <button @click="getCurrentRate" class="btn btn-primary">現在レートを取得 (未実装)</button>
+        <div v-for="currencyInfoItem in currencyInfo">
+          {{currencyInfoItem.name }} : <input type="number" min="0.00001" step="0.00001" v-model="currencyInfoItem.rate"
+            class="form-control">
+        </div>
+        <button @click="getCurrentRates" class="btn btn-primary">現在レートを取得 (未実装)</button>
       </div>
     </div>
 
@@ -131,14 +131,10 @@
       <div class="card-body">
         <h2>仮定レート</h2>
         <p class="text-muted">仮定のレートを入力してください。</p>
-        EURUSD: <input type="number" min="0.00001" step="0.00001" v-model="currencyInfo[0].rateExpected"
-          class="form-control">
-        USDJPY: <input type="number" min="0.001" step="0.001" v-model="currencyInfo[1].rateExpected"
-          class="form-control">
-        GBPUSD: <input type="number" min="0.00001" step="0.00001" v-model="currencyInfo[2].rateExpected"
-          class="form-control">
-        AUDUSD: <input type="number" min="0.00001" step="0.00001" v-model="currencyInfo[3].rateExpected"
-          class="form-control">
+        <div v-for="currencyInfoItem in currencyInfo">
+          {{currencyInfoItem.name }} : <input type="number" min="0.00001" step="0.00001"
+            v-model="currencyInfoItem.rateExpected" class="form-control">
+        </div>
         <button class="btn btn-primary">現在レートを取得 (未実装)</button>
       </div>
     </div>

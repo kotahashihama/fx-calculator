@@ -161,7 +161,7 @@ const app = new Vue({
     deletePosition: function (index) {
       this.positions.splice(index, 1)
     },
-    getCurrentRate: function () {
+    getCurrentRates: function () {
       axios.get('https://api.ratesapi.io/api/latest?base=USD')
         .then(function (response) {
           app.items = response.data.rates
@@ -169,7 +169,7 @@ const app = new Vue({
     }
   },
   mounted: function () {
-    this.getCurrentRate()
+    this.getCurrentRates()
   }
 })
 
