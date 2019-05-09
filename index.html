@@ -70,7 +70,7 @@
             <tbody>
               <tr>
                 <td>
-                  <select name="" id="" v-model='form.pair' class="form-control">
+                  <select name="" id="" v-model='form.pair' @change="setEntryRate" class="form-control">
                     <option v-for="currencyInfoItem in currencyInfo">
                       {{ currencyInfoItem.name }}
                     </option>
@@ -81,7 +81,7 @@
                   <label><input type="radio" name="action" value="sell" v-model="form.action"> sell</label>
                 </td>
                 <td><input type="number" min="0.01" step="0.01" v-model="form.lot" class="form-control"></td>
-                <td><input type="number" min="0.00001" step="0.00001" v-model="entryRate" class="form-control">
+                <td><input type="number" min="0.00001" step="0.00001" v-model="form.entryRate" class="form-control">
                 </td>
               </tr>
             </tbody>

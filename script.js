@@ -24,7 +24,8 @@ const currencyInfo = [
 const form = {
   pair: currencyInfo[0].name,
   action: 'buy',
-  lot: 0.01
+  lot: 0.01,
+  entryRate: currencyInfo[0].rate
 }
 
 const vm = new Vue({
@@ -48,6 +49,7 @@ const vm = new Vue({
     positions: [
 
     ],
+
     currencyInfo,
     form
   },
@@ -110,15 +112,6 @@ const vm = new Vue({
 
       return Math.round(totalPips * 10) / 10
     },
-    entryRate: function () {
-      const pair = this.form.pair
-      const currencyInfo = this.currencyInfo.find(function (currencyInfoItem) {
-        return (currencyInfoItem.name === pair)
-      })
-      console.log(currencyInfo)
-
-      return currencyInfo.rate
-    },
     necessaryMargin: function () {
       let totalNecessaryMargin = 0
 
@@ -150,12 +143,20 @@ const vm = new Vue({
     }
   },
   methods: {
+    setEntryRate: function () {
+      const pair = this.form.pair
+      const currencyInfo = this.currencyInfo.find(function (currencyInfoItem) {
+        return (currencyInfoItem.name === pair)
+      })
+
+      this.form.entryRate = currencyInfo.rate
+    },
     addPosition: function () {
       this.positions.push({
         pair: this.form.pair,
         action: this.form.action,
         lot: this.form.lot,
-        entryRate: this.entryRate
+        entryRate: this.form.entryRate
       })
     },
     deletePosition: function (index) {
