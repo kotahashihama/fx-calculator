@@ -30,8 +30,6 @@ const form = {
 const vm = new Vue({
   el: '#app',
   data: {
-    unrealizedValue: 0,
-
     broker: 'overseas',
     leverage: {
       overseas: 1000,
@@ -54,6 +52,35 @@ const vm = new Vue({
     form
   },
   computed: {
+    unrealizedValue: function () {
+      let totalUnrealizedValue = 0
+
+      for (let i = 0; i < this.positions.length; i++) {
+        const pair = this.positions[i].pair
+        const currencyInfo = this.currencyInfo.find(function (currencyInfoItem) {
+          return (currencyInfoItem.name === pair)
+        })
+        const usdJpyInfo = this.currencyInfo[1]
+
+        if (currencyInfo.name === 'USDJPY') {
+          // ドル円の処理
+          if (this.positions[i].action === 'buy') {
+            totalUnrealizedValue += (currencyInfo.rateExpected - this.positions[i].entryRate) * this.standardSizes[this.broker] * this.positions[i].lot
+          } else {
+            totalUnrealizedValue += -(currencyInfo.rateExpected - this.positions[i].entryRate) * this.standardSizes[this.broker] * this.positions[i].lot
+          }
+        } else {
+          // それ以外の通貨ペアの処理
+          if (this.positions[i].action === 'buy') {
+            totalUnrealizedValue += (currencyInfo.rateExpected - this.positions[i].entryRate) * this.standardSizes[this.broker] * this.positions[i].lot * usdJpyInfo.rate
+          } else {
+            totalUnrealizedValue += -(currencyInfo.rateExpected - this.positions[i].entryRate) * this.standardSizes[this.broker] * this.positions[i].lot * usdJpyInfo.rate
+          }
+        }
+      }
+
+      return Math.round(totalUnrealizedValue)
+    },
     pips: function () {
       let totalPips = 0
 

@@ -16,18 +16,18 @@
 <body>
   <h1 class="text-center">含み損益・証拠金シュミレーター</h1>
   <div id="app" class="container" v-cloak>
-    <div v-show="positions.length > 0">
-      <h2>結果</h2>
-      <h3>含み損益</h3>
-      <p>{{ unrealizedValue }} 円 (未実装)<br>
-        {{ pips }} pips</p>
-      <h3>必要証拠金</h3>
-      <p>{{ necessaryMargin }} 円</p>
-      <h3>証拠金維持率</h3>
-      <p>{{ marginLevel }} ％</p>
-      <p v-show="marginLevel < 100" class="text-danger"><i class="fas fa-exclamation-triangle"></i> 100%を下回っています！
-      </p>
-    </div>
+    <!-- <div v-show="positions.length > 0"> -->
+    <h2>結果</h2>
+    <h3>含み損益</h3>
+    <p>{{ unrealizedValue }} 円<br>
+      {{ pips }} pips</p>
+    <h3>必要証拠金</h3>
+    <p>{{ necessaryMargin }} 円</p>
+    <h3>証拠金維持率</h3>
+    <p>{{ marginLevel }} ％</p>
+    <p v-show="marginLevel < 100" class="text-danger"><i class="fas fa-exclamation-triangle"></i> 100%を下回っています！
+    </p>
+    <!-- </div> -->
 
     <div class="card">
       <div class="card-body">
