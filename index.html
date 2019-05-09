@@ -8,8 +8,8 @@
 
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
     integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-  <!-- <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
-    integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous"> -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+    integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -19,15 +19,14 @@
     <div class="card">
       <div class="card-body">
         <h2>結果</h2>
-        <h3>合計pips</h3>
-        <p>{{ pips }} pips</p>
-        <h3>含み損益</h3>
-        <p>{{ unrealizedValue }} 円</p>
+        <h3>含み損益 (未実装)</h3>
+        <p>{{ unrealizedValue }} 円<br>
+          {{ pips }} pips</p>
         <h3>必要証拠金</h3>
         <p>{{ necessaryMargin }} 円</p>
         <h3>証拠金維持率</h3>
         <p>{{ marginLevel }} ％</p>
-        <p v-show="marginLevel < 100" class="text-danger">100%を下回っています！</p>
+        <p v-show="marginLevel < 100" class="text-danger"><i class="fas fa-exclamation-triangle"></i> 100%を下回っています！</p>
       </div>
     </div>
 
@@ -73,8 +72,8 @@
               <tr>
                 <td>
                   <select name="" id="" v-model='form.pair'>
-                    <option v-for="pair in pairs">
-                      {{ pair.name }}
+                    <option v-for="currencyInfoItem in currencyInfo">
+                      {{ currencyInfoItem.name }}
                     </option>
                   </select>
                 </td>
@@ -117,13 +116,13 @@
 
     <div class="card">
       <div class="card-body">
-        <h2>想定レート</h2>
+        <h2>想定レート (未実装)</h2>
         <input type="number" min="0.00001" step="0.00001" class="form-control">
         <button class="btn btn-primary">現在レート</button>
       </div>
     </div>
 
-    <pre>{{ $data }}</pre>
+    <!-- <pre>{{ $data }}</pre> -->
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>

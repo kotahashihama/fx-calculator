@@ -1,4 +1,4 @@
-const pairs = [
+const currencyInfo = [
   {
     name: 'EURUSD',
     rate: 1.12030
@@ -18,10 +18,10 @@ const pairs = [
 ]
 
 const form = {
-  pair: pairs[0].name,
+  pair: currencyInfo[0].name,
   action: 'buy',
   lot: 0.01,
-  entryRate: pairs[0].rate
+  entryRate: currencyInfo[0].rate
 }
 
 const vm = new Vue({
@@ -45,24 +45,35 @@ const vm = new Vue({
       japan: [25, 20, 10, 5]
     },
 
-    positions: [],
-    pairs,
+    positions: [
+
+    ],
+    currencyInfo,
     form
   },
   computed: {
-    lot: function () {
-      let totalLot = 0
-      for (let i = 0; i < this.positions.length; i++) {
-        totalLot += this.positions[i].lot
-      }
-      return totalLot
-    },
     necessaryMargin: function () {
       let totalNecessaryMargin = 0
+
       for (let i = 0; i < this.positions.length; i++) {
-        totalNecessaryMargin += this.positions[i].necessaryMargin
+        const pair = this.positions[i].pair
+        const currencyInfo = this.currencyInfo.find(function (currencyInfoItem) {
+          return (currencyInfoItem.name === pair)
+        })
+        const usdJpyInfo = this.currencyInfo[1]
+        console.log(currencyInfo.name)
+
+        if (currencyInfo.name === 'USDJPY') {
+          // ドル円の処理
+          totalNecessaryMargin += usdJpyInfo.rate * this.standardSizes[this.broker] * this.positions[i].lot / this.leverage[this.broker]
+        } else {
+          // それ以外の通貨ペアの処理
+          totalNecessaryMargin += currencyInfo.rate * usdJpyInfo.rate * this.standardSizes[this.broker] * this.positions[i].lot / this.leverage[this.broker]
+        }
       }
-      return totalNecessaryMargin
+      // 必要証拠金 = 為替レート × Lot数 ÷ レバレッジ比率
+
+      return Math.round(totalNecessaryMargin)
     },
     marginLevel: function () {
       if (this.positions.length) {
@@ -74,32 +85,12 @@ const vm = new Vue({
   },
   methods: {
     addPosition: function () {
-      const pair = this.form.pair
-      const target = this.pairs.find(function (p) {
-        return (p.name === pair)
+      this.positions.push({
+        pair: this.form.pair,
+        action: this.form.action,
+        lot: this.form.lot,
+        entryRate: this.form.entryRate
       })
-      console.log(target.name)
-
-      if (target.name === 'USDJPY') {
-        this.positions.push({
-          pair,
-          action: this.form.action,
-          lot: this.form.lot,
-          entryRate: this.form.entryRate,
-          necessaryMargin: Math.round(this.form.entryRate * this.standardSizes[this.broker] * this.form.lot / this.leverage),
-        })
-      } else {
-        this.positions.push({
-          pair,
-          action: this.form.action,
-          lot: this.form.lot,
-          entryRate: this.form.entryRate,
-          necessaryMargin: Math.round(target.rate * this.form.entryRate * this.standardSizes[this.broker] * this.form.lot / this.leverage)
-        })
-      }
-    },
-    leverage: function () {
-      this.leverages[broker][0]
     }
   }
 })
