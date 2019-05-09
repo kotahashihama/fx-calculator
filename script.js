@@ -111,6 +111,9 @@ const app = new Vue({
 
       return Math.round(totalPips * 10) / 10
     },
+    equity: function () {
+      return Number(this.balance) + this.unrealizedValue
+    },
     necessaryMargin: function () {
       let totalNecessaryMargin = 0
 
@@ -135,7 +138,7 @@ const app = new Vue({
     },
     marginLevel: function () {
       if (this.positions.length) {
-        return Math.round(this.balance / this.necessaryMargin * 10000) / 100
+        return Math.round(this.equity / this.necessaryMargin * 10000) / 100
       } else {
         return 0
       }
