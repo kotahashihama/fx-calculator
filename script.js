@@ -28,7 +28,7 @@ const form = {
   entryRate: currencyInfo[0].rate
 }
 
-const vm = new Vue({
+const app = new Vue({
   el: '#app',
   data: {
     broker: 'overseas',
@@ -46,9 +46,8 @@ const vm = new Vue({
       japan: [25, 20, 10, 5]
     },
 
-    positions: [
-
-    ],
+    positions: [],
+    items: null,
 
     currencyInfo,
     form
@@ -161,6 +160,17 @@ const vm = new Vue({
     },
     deletePosition: function (index) {
       this.positions.splice(index, 1)
+    },
+    getCurrentRate: function () {
+      axios.get('https://api.ratesapi.io/api/latest?base=USD')
+        .then(function (response) {
+          app.items = response.data.rates
+        })
     }
+  },
+  mounted: function () {
+    this.getCurrentRate()
   }
 })
+
+window.app = app
