@@ -106,12 +106,12 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="position in positions">
+              <tr v-for="(position, index) in positions">
                 <td>{{ position.pair }}</td>
                 <td>{{ position.action }}</td>
                 <td>{{ position.lot }}</td>
                 <td>{{ position.entryRate }}</td>
-                <td><button class="btn btn-danger">削除</button></td>
+                <td><button @click="deletePosition(index)" class="btn btn-danger">削除</button></td>
               </tr>
             </tbody>
           </table>

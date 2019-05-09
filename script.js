@@ -91,6 +91,9 @@ const vm = new Vue({
         lot: this.form.lot,
         entryRate: this.form.entryRate
       })
+    },
+    deletePosition: function (index) {
+      this.positions.splice(index, 1)
     }
   }
 })
