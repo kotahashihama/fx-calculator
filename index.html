@@ -21,6 +21,8 @@
     <h3>含み損益</h3>
     <p>{{ unrealizedValue }} 円<br>
       {{ pips }} pips</p>
+    <h3>有効証拠金</h3>
+    <p>{{ Number(balance) + unrealizedValue }} 円</p>
     <h3>必要証拠金</h3>
     <p>{{ necessaryMargin }} 円</p>
     <h3>証拠金維持率</h3>
