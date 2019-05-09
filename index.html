@@ -19,8 +19,8 @@
     <div class="card">
       <div class="card-body">
         <h2>結果</h2>
-        <h3>含み損益 (未実装)</h3>
-        <p>{{ unrealizedValue }} 円<br>
+        <h3>含み損益</h3>
+        <p>{{ unrealizedValue }} 円 (未実装)<br>
           {{ pips }} pips</p>
         <h3>必要証拠金</h3>
         <p>{{ necessaryMargin }} 円</p>
@@ -124,7 +124,7 @@
         <h2>現在レート</h2>
         <p class="text-muted">現在のレートを入力してください。</p>
         EURUSD: <input type="number" min="0.00001" step="0.00001" v-model="currencyInfo[0].rate" class="form-control">
-        USDJPY: <input type="number" min="0.00001" step="0.00001" v-model="currencyInfo[1].rate" class="form-control">
+        USDJPY: <input type="number" min="0.001" step="0.001" v-model="currencyInfo[1].rate" class="form-control">
         GBPUSD: <input type="number" min="0.00001" step="0.00001" v-model="currencyInfo[2].rate" class="form-control">
         AUDUSD: <input type="number" min="0.00001" step="0.00001" v-model="currencyInfo[3].rate" class="form-control">
         <button class="btn btn-primary">現在レートを取得 (未実装)</button>
@@ -135,15 +135,19 @@
       <div class="card-body">
         <h2>仮定レート</h2>
         <p class="text-muted">仮定のレートを入力してください。</p>
-        EURUSD: <input type="number" min="0.00001" step="0.00001" v-model="currencyInfo[0].rate" class="form-control">
-        USDJPY: <input type="number" min="0.00001" step="0.00001" v-model="currencyInfo[1].rate" class="form-control">
-        GBPUSD: <input type="number" min="0.00001" step="0.00001" v-model="currencyInfo[2].rate" class="form-control">
-        AUDUSD: <input type="number" min="0.00001" step="0.00001" v-model="currencyInfo[3].rate" class="form-control">
+        EURUSD: <input type="number" min="0.00001" step="0.00001" v-model="currencyInfo[0].rateExpected"
+          class="form-control">
+        USDJPY: <input type="number" min="0.001" step="0.001" v-model="currencyInfo[1].rateExpected"
+          class="form-control">
+        GBPUSD: <input type="number" min="0.00001" step="0.00001" v-model="currencyInfo[2].rateExpected"
+          class="form-control">
+        AUDUSD: <input type="number" min="0.00001" step="0.00001" v-model="currencyInfo[3].rateExpected"
+          class="form-control">
         <button class="btn btn-primary">現在レートを取得 (未実装)</button>
       </div>
     </div>
 
-    <pre>{{ $data }}</pre>
+    <!-- <pre>{{ $data }}</pre> -->
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>

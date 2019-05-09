@@ -1,19 +1,23 @@
 const currencyInfo = [
   {
     name: 'EURUSD',
-    rate: 1.12030
+    rate: 1.12030,
+    rateExpected: 1.12030
   },
   {
     name: 'USDJPY',
-    rate: 110.148
+    rate: 110.148,
+    rateExpected: 110.148
   },
   {
     name: 'GBPUSD',
-    rate: 1.30377
+    rate: 1.30377,
+    rateExpected: 1.30377
   },
   {
     name: 'AUDUSD',
-    rate: 0.70186
+    rate: 0.70186,
+    rateExpected: 0.70186
   }
 ]
 
@@ -51,7 +55,25 @@ const vm = new Vue({
   },
   computed: {
     pips: function () {
-      return 0
+      let totalPips = 0
+
+      for (let i = 0; i < this.positions.length; i++) {
+        const pair = this.positions[i].pair
+        const currencyInfo = this.currencyInfo.find(function (currencyInfoItem) {
+          return (currencyInfoItem.name === pair)
+        })
+        const usdJpyInfo = this.currencyInfo[1]
+
+        if (currencyInfo.name === 'USDJPY') {
+          // ドル円の処理
+          totalPips += (currencyInfo.rateExpected - this.positions[i].entryRate) * 100
+        } else {
+          // それ以外の通貨ペアの処理
+          totalPips += (currencyInfo.rateExpected - this.positions[i].entryRate) * 10000
+        }
+      }
+
+      return Math.round(totalPips * 10) / 10
     },
     entryRate: function () {
       const pair = this.form.pair
