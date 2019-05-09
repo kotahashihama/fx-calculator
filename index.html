@@ -44,7 +44,7 @@
 
           <h3>レバレッジ</h3>
           <div>
-            <select name="" id="" v-model="leverage[broker]">
+            <select name="" id="" v-model="leverage[broker]" class="form-control">
               <option :value="leverage" v-for="leverage in leverages[broker]">{{ leverage }}</option>
             </select> 倍
           </div>
@@ -62,8 +62,8 @@
 
         <h3>ポジションを追加する</h3>
         <form action="" @submit.prevent="addPosition">
-          <table>
-            <thead>
+          <table class="table">
+            <thead class="thead-dark">
               <tr>
                 <th>通貨ペア</th>
                 <th>売買</th>
@@ -74,7 +74,7 @@
             <tbody>
               <tr>
                 <td>
-                  <select name="" id="" v-model='form.pair'>
+                  <select name="" id="" v-model='form.pair' class="form-control">
                     <option v-for="currencyInfoItem in currencyInfo">
                       {{ currencyInfoItem.name }}
                     </option>
@@ -95,8 +95,8 @@
 
         <div v-show="positions.length > 0">
           <h3>保有ポジション</h3>
-          <table>
-            <thead>
+          <table class="table">
+            <thead class="thead-dark">
               <tr>
                 <th>通貨ペア</th>
                 <th>売買</th>
@@ -127,15 +127,19 @@
         USDJPY: <input type="number" min="0.00001" step="0.00001" v-model="currencyInfo[1].rate" class="form-control">
         GBPUSD: <input type="number" min="0.00001" step="0.00001" v-model="currencyInfo[2].rate" class="form-control">
         AUDUSD: <input type="number" min="0.00001" step="0.00001" v-model="currencyInfo[3].rate" class="form-control">
-        <button class="btn btn-primary">APIから取得 (未実装)</button>
+        <button class="btn btn-primary">現在レートを取得 (未実装)</button>
       </div>
     </div>
 
     <div class="card">
       <div class="card-body">
-        <h2>仮定レート (未実装)</h2>
-        <input type="number" min="0.00001" step="0.00001" class="form-control">
-        <button class="btn btn-primary">現在レート</button>
+        <h2>仮定レート</h2>
+        <p class="text-muted">仮定のレートを入力してください。</p>
+        EURUSD: <input type="number" min="0.00001" step="0.00001" v-model="currencyInfo[0].rate" class="form-control">
+        USDJPY: <input type="number" min="0.00001" step="0.00001" v-model="currencyInfo[1].rate" class="form-control">
+        GBPUSD: <input type="number" min="0.00001" step="0.00001" v-model="currencyInfo[2].rate" class="form-control">
+        AUDUSD: <input type="number" min="0.00001" step="0.00001" v-model="currencyInfo[3].rate" class="form-control">
+        <button class="btn btn-primary">現在レートを取得 (未実装)</button>
       </div>
     </div>
 
