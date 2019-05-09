@@ -24,9 +24,12 @@
           {{ pips }} pips</p>
         <h3>必要証拠金</h3>
         <p>{{ necessaryMargin }} 円</p>
-        <h3>証拠金維持率</h3>
-        <p>{{ marginLevel }} ％</p>
-        <p v-show="marginLevel < 100" class="text-danger"><i class="fas fa-exclamation-triangle"></i> 100%を下回っています！</p>
+        <div v-show="positions.length > 0">
+          <h3>証拠金維持率</h3>
+          <p>{{ marginLevel }} ％</p>
+          <p v-show="marginLevel < 100" class="text-danger"><i class="fas fa-exclamation-triangle"></i> 100%を下回っています！
+          </p>
+        </div>
       </div>
     </div>
 
@@ -90,27 +93,29 @@
           <button type="submit" class="btn btn-primary">追加</button>
         </form>
 
-        <h3>保有ポジション</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>通貨ペア</th>
-              <th>売買</th>
-              <th>ロット</th>
-              <th>エントリー価格</th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="position in positions">
-              <td>{{ position.pair }}</td>
-              <td>{{ position.action }}</td>
-              <td>{{ position.lot }}</td>
-              <td>{{ position.entryRate }}</td>
-              <td><button class="btn btn-danger">削除</button></td>
-            </tr>
-          </tbody>
-        </table>
+        <div v-show="positions.length > 0">
+          <h3>保有ポジション</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>通貨ペア</th>
+                <th>売買</th>
+                <th>ロット</th>
+                <th>エントリー価格</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="position in positions">
+                <td>{{ position.pair }}</td>
+                <td>{{ position.action }}</td>
+                <td>{{ position.lot }}</td>
+                <td>{{ position.entryRate }}</td>
+                <td><button class="btn btn-danger">削除</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -122,7 +127,7 @@
       </div>
     </div>
 
-    <!-- <pre>{{ $data }}</pre> -->
+    <pre>{{ $data }}</pre>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
