@@ -25,7 +25,7 @@ const form = {
   pair: currencyInfo[0].name,
   action: 'buy',
   lot: 0.01,
-  entryRate: currencyInfo[0].rate
+  entryRate: 0
 }
 
 const app = new Vue({
@@ -201,6 +201,7 @@ const app = new Vue({
       .then(function (response) {
         app.items = response.data.rates
         app.getCurrentRates()
+        app.form.entryRate = Math.round(1 / app.items['EUR'] * 100000) / 100000
       })
   }
 })
