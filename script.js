@@ -1,8 +1,8 @@
 const currencyInfo = [
   {
     name: 'EURUSD',
-    rate: 1.12030,
-    rateExpected: 1.12030
+    rate: 0,
+    rateExpected: 0
   },
   {
     name: 'USDJPY',
@@ -162,14 +162,46 @@ const app = new Vue({
       this.positions.splice(index, 1)
     },
     getCurrentRates: function () {
-      axios.get('https://api.ratesapi.io/api/latest?base=USD')
-        .then(function (response) {
-          app.items = response.data.rates
-        })
+      for (let i = 0; i < this.currencyInfo.length; i++) {
+        const pair = this.currencyInfo[i].name
+        const aaa = this.currencyInfo[i].name.slice(0, 3)
+
+        if (pair === 'USDJPY') {
+          this.currencyInfo[i].rate = Math.round(this.items.JPY * 1000) / 1000
+          this.currencyInfo[i].rateExpected = Math.round(this.items.JPY * 1000) / 1000
+        } else {
+          this.currencyInfo[i].rate = Math.round(1 / this.items[aaa] * 100000) / 100000
+          this.currencyInfo[i].rateExpected = Math.round(1 / this.items[aaa] * 100000) / 100000
+        }
+      }
+    },
+    setCurrentRate: function (index) {
+      const pair = this.currencyInfo[index].name
+      const aaa = this.currencyInfo[index].name.slice(0, 3)
+
+      if (pair === 'USDJPY') {
+        this.currencyInfo[index].rate = Math.round(this.items.JPY * 1000) / 1000
+      } else {
+        this.currencyInfo[index].rate = Math.round(1 / this.items[aaa] * 100000) / 100000
+      }
+    },
+    setCurrentRateExpected: function (index) {
+      const pair = this.currencyInfo[index].name
+      const aaa = this.currencyInfo[index].name.slice(0, 3)
+
+      if (pair === 'USDJPY') {
+        this.currencyInfo[index].rateExpected = Math.round(this.items.JPY * 1000) / 1000
+      } else {
+        this.currencyInfo[index].rateExpected = Math.round(1 / this.items[aaa] * 100000) / 100000
+      }
     }
   },
   mounted: function () {
-    this.getCurrentRates()
+    axios.get('https://api.ratesapi.io/api/latest?base=USD')
+      .then(function (response) {
+        app.items = response.data.rates
+        app.getCurrentRates()
+      })
   }
 })
 
