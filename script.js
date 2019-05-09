@@ -20,14 +20,12 @@ const currencyInfo = [
 const form = {
   pair: currencyInfo[0].name,
   action: 'buy',
-  lot: 0.01,
-  entryRate: currencyInfo[0].rate
+  lot: 0.01
 }
 
 const vm = new Vue({
   el: '#app',
   data: {
-    pips: 0,
     unrealizedValue: 0,
 
     broker: 'overseas',
@@ -52,6 +50,18 @@ const vm = new Vue({
     form
   },
   computed: {
+    pips: function () {
+      return 0
+    },
+    entryRate: function () {
+      const pair = this.form.pair
+      const currencyInfo = this.currencyInfo.find(function (currencyInfoItem) {
+        return (currencyInfoItem.name === pair)
+      })
+      console.log(currencyInfo)
+
+      return currencyInfo.rate
+    },
     necessaryMargin: function () {
       let totalNecessaryMargin = 0
 
@@ -61,7 +71,6 @@ const vm = new Vue({
           return (currencyInfoItem.name === pair)
         })
         const usdJpyInfo = this.currencyInfo[1]
-        console.log(currencyInfo.name)
 
         if (currencyInfo.name === 'USDJPY') {
           // ドル円の処理
@@ -89,7 +98,7 @@ const vm = new Vue({
         pair: this.form.pair,
         action: this.form.action,
         lot: this.form.lot,
-        entryRate: this.form.entryRate
+        entryRate: this.entryRate
       })
     },
     deletePosition: function (index) {
