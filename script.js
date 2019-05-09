@@ -69,7 +69,7 @@ const vm = new Vue({
           totalPips += (currencyInfo.rateExpected - this.positions[i].entryRate) * 100
         } else {
           // それ以外の通貨ペアの処理
-          totalPips += (currencyInfo.rateExpected - this.positions[i].entryRate) * 10000
+          totalPips += ((currencyInfo.rateExpected - this.positions[i].entryRate) * 100) * usdJpyInfo.rate
         }
       }
 
