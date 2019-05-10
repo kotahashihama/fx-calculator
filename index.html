@@ -20,7 +20,7 @@
         <div class="container">
           <a href="#" class="navbar-brand">ポジション計算機</a>
           <span class="navbar-text">
-            <span v-show="unrealizedValue > 0">+</span>{{ unrealizedValue }} 円
+            <span v-show="unrealizedValue > 0">+</span>{{ unrealizedValue | withDelimiter }} 円
           </span>
         </div>
       </nav>
@@ -36,22 +36,22 @@
             </li>
             <li class="list-group-item">
               <p>ピップス</p>
-              <p><span v-show="unrealizedValue > 0">+</span>{{ pips }} pips</p>
+              <p><span v-show="unrealizedValue > 0">+</span>{{ pips | withDelimiter }} pips</p>
             </li>
             <li class="list-group-item">
               <p>有効証拠金</p>
-              <p>{{ equity }} 円</p>
+              <p>{{ equity | withDelimiter }} 円</p>
             </li>
             <li class="list-group-item">
               <p>証拠金維持率</p>
-              <p>{{ marginLevel }} ％</p>
+              <p>{{ marginLevel | withDelimiter }} ％</p>
               <p v-show="marginLevel < 100" class="text-danger"><i class="fas fa-exclamation-triangle"></i>
                 100%を下回っています！
               </p>
             </li>
             <li class="list-group-item">
               <p>必要証拠金</p>
-              <p>{{ necessaryMargin }} 円</p>
+              <p>{{ necessaryMargin | withDelimiter }} 円</p>
           </ul>
         </div>
 

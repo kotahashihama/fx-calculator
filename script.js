@@ -201,6 +201,11 @@ const app = new Vue({
       }
     }
   },
+  filters: {
+    withDelimiter: function (value) {
+      return value.toLocaleString()
+    }
+  },
   mounted: function () {
     axios.get('https://api.ratesapi.io/api/latest?base=USD')
       .then(function (response) {
