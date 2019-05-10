@@ -162,7 +162,9 @@ const app = new Vue({
       })
     },
     deletePosition: function (index) {
-      this.positions.splice(index, 1)
+      if (confirm('削除してもよろしいですか？')) {
+        this.positions.splice(index, 1)
+      }
     },
     getCurrentRates: function () {
       for (let i = 0; i < this.currencyInfo.length; i++) {
