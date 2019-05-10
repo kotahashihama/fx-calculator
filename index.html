@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>含み損益・証拠金シュミレーター</title>
+  <title>ポジション計算機</title>
 
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
     integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
@@ -14,134 +14,131 @@
 </head>
 
 <body>
-  <h1 class="text-center">含み損益・証拠金シュミレーター</h1>
-  <div id="app" class="container" v-cloak>
-    <!-- <div v-show="positions.length > 0"> -->
-    <h2>結果</h2>
-    <h3>含み損益</h3>
-    <p>{{ unrealizedValue }} 円<br>
-      {{ pips }} pips</p>
-    <h3>有効証拠金</h3>
-    <p>{{ equity }} 円</p>
-    <h3>必要証拠金</h3>
-    <p>{{ necessaryMargin }} 円</p>
-    <h3>証拠金維持率</h3>
-    <p>{{ marginLevel }} ％</p>
-    <p v-show="marginLevel < 100" class="text-danger"><i class="fas fa-exclamation-triangle"></i> 100%を下回っています！
-    </p>
-    <!-- </div> -->
-
-    <div class="card">
-      <div class="card-body">
-        <h2>基礎設定</h2>
-
-        <div>
-          <h3>業者</h3>
-          <label><input type="radio" name="broker" value="overseas" v-model="broker"> 海外</label>
-          <label><input type="radio" name="broker" value="japan" v-model="broker"> 国内</label>
-
-          <h3>レバレッジ</h3>
-          <div>
-            <select name="" id="" v-model="leverage[broker]" class="form-control">
-              <option :value="leverage" v-for="leverage in leverages[broker]">{{ leverage }}</option>
-            </select> 倍
-          </div>
-
-          <h3>残高</h3>
-          <input type="number" min="0" v-model="balance" class="form-control">
+  <div id="app" v-cloak>
+    <header class="sticky-top mb-3">
+      <nav class="navbar navbar-dark" :class="[unrealizedValue >= 0 ? 'navbar-blue' : 'navbar-red']">
+        <div class="container">
+          <a href="#" class="navbar-brand">ポジション計算機</a>
+          <span class="navbar-text">
+            <span v-show="unrealizedValue > 0">+</span>{{ unrealizedValue }} 円
+          </span>
         </div>
+      </nav>
+    </header>
+
+    <div class="container">
+      <div class="row mb-3">
+        <div class="col-12 col-sm-6">
+          <ul class="list-group mb-3 mb-sm-0">
+            <li class="list-group-item">
+              <p>残高（クレジット含む）</p>
+              <input type="number" min="0" v-model="balance" class="form-control"> 円
+            </li>
+            <li class="list-group-item">
+              <p>ピップス</p>
+              <p>{{ pips }} pips</p>
+            </li>
+            <li class="list-group-item">
+              <p>有効証拠金</p>
+              <p>{{ equity }} 円</p>
+            </li>
+            <li class="list-group-item">
+              <p>証拠金維持率</p>
+              <p>{{ marginLevel }} ％</p>
+              <p v-show="marginLevel < 100" class="text-danger"><i class="fas fa-exclamation-triangle"></i>
+                100%を下回っています！
+              </p>
+            </li>
+            <li class="list-group-item">
+              <p>必要証拠金</p>
+              <p>{{ necessaryMargin }} 円</p>
+          </ul>
+        </div>
+
+        <div class="col-12 col-sm-6">
+          <ul class="list-group">
+            <li class="list-group-item">
+              <p>業者</p>
+              <label><input type="radio" name="broker" value="overseas" v-model="broker"> 海外</label>
+              <label><input type="radio" name="broker" value="japan" v-model="broker"> 国内</label>
+            </li>
+
+            <li class="list-group-item">
+              <p>レバレッジ</p>
+              <select name="" id="" v-model="leverage[broker]" class="form-control">
+                <option :value="leverage" v-for="leverage in leverages[broker]">{{ leverage }}</option>
+              </select> 倍
+            </li>
+
+            <li class="list-group-item">
+              <p>仮定レート</p>
+
+              <div v-for="(currencyInfoItem, index) in currencyInfo">
+                <div class="form-group">
+                  <label for="">{{ currencyInfoItem.name }}</label>
+                  <div class="input-group">
+                    <input type="number" min="0.00001" step="0.00001" v-model="currencyInfoItem.rateExpected"
+                      class="form-control">
+                    <div class="input-group-append">
+                      <button @click="setCurrentRateExpected(index)" class="btn btn-outline-primary">現在値を取得</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div>
+        <p>保有ポジション</p>
+        <table class="table">
+          <thead class="thead-dark">
+            <tr>
+              <th>通貨ペア</th>
+              <th>売買</th>
+              <th>ロット</th>
+              <th>エントリーレート</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><select name="" id="" v-model='form.pair' @change="setEntryRate" class="form-control">
+                  <option v-for="currencyInfoItem in currencyInfo">
+                    {{ currencyInfoItem.name }}
+                  </option>
+                </select>
+              </td>
+              <td>
+                <label><input type="radio" name="action" value="buy" v-model="form.action"> buy</label>
+                <label><input type="radio" name="action" value="sell" v-model="form.action"> sell</label>
+              </td>
+              <td><input type="number" min="0.01" step="0.01" v-model="form.lot" class="form-control"></td>
+              <td><input type="number" min="0.00001" step="0.00001" v-model="form.entryRate" class="form-control">
+              </td>
+              <td><button @click="addPosition" class="btn btn-primary">追加</button></td>
+            </tr>
+            <tr v-for="(position, index) in positions">
+              <td>{{ position.pair }}</td>
+              <td>{{ position.action }}</td>
+              <td>{{ position.lot }}</td>
+              <td>{{ position.entryRate }}</td>
+              <td><button @click="deletePosition(index)" class="btn btn-danger">削除</button></td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-body">
-        <h2>ポジション</h2>
-        <p class="text-muted">持っているポジションを入力してください。</p>
-
-        <h3>ポジションを追加する</h3>
-        <form action="" @submit.prevent="addPosition">
-          <table class="table">
-            <thead class="thead-dark">
-              <tr>
-                <th>通貨ペア</th>
-                <th>売買</th>
-                <th>ロット</th>
-                <th>エントリーレート</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>
-                  <select name="" id="" v-model='form.pair' @change="setEntryRate" class="form-control">
-                    <option v-for="currencyInfoItem in currencyInfo">
-                      {{ currencyInfoItem.name }}
-                    </option>
-                  </select>
-                </td>
-                <td>
-                  <label><input type="radio" name="action" value="buy" v-model="form.action"> buy</label>
-                  <label><input type="radio" name="action" value="sell" v-model="form.action"> sell</label>
-                </td>
-                <td><input type="number" min="0.01" step="0.01" v-model="form.lot" class="form-control"></td>
-                <td><input type="number" min="0.00001" step="0.00001" v-model="form.entryRate" class="form-control">
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <button type="submit" class="btn btn-primary">追加</button>
-        </form>
-
-        <div v-show="positions.length > 0">
-          <h3>保有ポジション</h3>
-          <table class="table">
-            <thead class="thead-dark">
-              <tr>
-                <th>通貨ペア</th>
-                <th>売買</th>
-                <th>ロット</th>
-                <th>エントリーレート</th>
-                <th>操作</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(position, index) in positions">
-                <td>{{ position.pair }}</td>
-                <td>{{ position.action }}</td>
-                <td>{{ position.lot }}</td>
-                <td>{{ position.entryRate }}</td>
-                <td><button @click="deletePosition(index)" class="btn btn-danger">削除</button></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-body">
-        <h2>現在レート</h2>
-        <p class="text-muted">現在のレートを入力してください。</p>
-        <div v-for="(currencyInfoItem, index) in currencyInfo">
-          {{ currencyInfoItem.name }} : <input type="number" min="0.00001" step="0.00001"
-            v-model="currencyInfoItem.rate" class="form-control">
-          <button @click="setCurrentRate(index)" class="btn btn-primary">現在レートを取得</button>
-        </div>
+    <footer class="bg-light mt-5 py-3">
+      <div class="container">
+        <p class="text-center m-0"><small>&copy; ポジション計算機 developed by <a href="https://kotahashihama.com/"
+              target="_blank">Kota
+              Hashihama</a></small></p>
 
       </div>
-    </div>
-
-    <div class="card">
-      <div class="card-body">
-        <h2>仮定レート</h2>
-        <p class="text-muted">仮定のレートを入力してください。</p>
-        <div v-for="(currencyInfoItem, index) in currencyInfo">
-          {{ currencyInfoItem.name }} : <input type="number" min="0.00001" step="0.00001"
-            v-model="currencyInfoItem.rateExpected" class="form-control">
-          <button @click="setCurrentRateExpected(index)" class="btn btn-primary">現在レートを取得</button>
-        </div>
-      </div>
-    </div>
-
+    </footer>
     <!-- <pre>{{ $data }}</pre> -->
   </div>
 
