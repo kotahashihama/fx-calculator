@@ -37,6 +37,7 @@ const app = new Vue({
       overseas: 1000,
       japan: 25
     },
+    targetMarginLevel: 1000,
 
     tradingUnits: {
       overseas: 100000,
@@ -143,6 +144,9 @@ const app = new Vue({
       } else {
         return 0
       }
+    },
+    difference: function () {
+      return Math.round(this.targetMarginLevel * this.necessaryMargin / 100 - this.equity)
     }
   },
   methods: {

@@ -48,6 +48,10 @@
               <p v-show="marginLevel < 100" class="text-danger"><i class="fas fa-exclamation-triangle"></i>
                 100%を下回っています！
               </p>
+              <p>維持率<input type="number" min="0" v-model="targetMarginLevel" class="form-control">
+                <span v-show="difference >= 0">％にするには{{ difference }}円の入金が必要です</span>
+                <span v-show="difference < 0">％にするには{{ -difference }}円の出金が必要です</span>
+              </p>
             </li>
             <li class="list-group-item">
               <p>必要証拠金</p>
