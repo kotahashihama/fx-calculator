@@ -27,6 +27,19 @@
     </header>
 
     <div class="container">
+      <div class="card mb-3">
+        <div class="card-body">
+          <p>Myfxbookから情報を取得する (未実装)</p>
+          <div class="form-group">
+            <p>Email: <input type="email" v-model="myfxbookEmail" class="form-control"></p>
+            <p>Password: <input type="password" v-model="myfxbookPassword" class="form-control"></p>
+            <button @click="loginMyfxbook" class="btn btn-primary">ログイン</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
       <div class="row mb-3">
         <div class="col-12 col-sm-6">
           <ul class="list-group mb-3 mb-sm-0">
@@ -88,7 +101,7 @@
                   <div class="input-group">
                     <input type="number" min="0.00001" step="0.00001" v-model="pair.rateExpected" class="form-control">
                     <div class="input-group-append">
-                      <button @click="setCurrentRateExpected(index)" class="btn btn-outline-primary">現在値を取得</button>
+                      <button @click="setCurrentRateExpected(index)" class="btn btn-outline-primary">現在レート</button>
                     </div>
                   </div>
                 </div>
@@ -97,47 +110,46 @@
           </ul>
         </div>
       </div>
+    </div>
 
-      <div>
-        <p>保有ポジション</p>
-        <table class="table">
-          <thead class="thead-dark">
-            <tr>
-              <th>通貨ペア</th>
-              <th>売買</th>
-              <th>ロット</th>
-              <th>エントリーレート</th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><select name="" id="" v-model='positionForm.pair' @change="setEntryRate" class="form-control">
-                  <option v-for="pair in pairs">
-                    {{ pair.name }}
-                  </option>
-                </select>
-              </td>
-              <td>
-                <label><input type="radio" name="action" value="buy" v-model="positionForm.action"> buy</label>
-                <label><input type="radio" name="action" value="sell" v-model="positionForm.action"> sell</label>
-              </td>
-              <td><input type="number" min="0.01" step="0.01" v-model="positionForm.lot" class="form-control"></td>
-              <td><input type="number" min="0.00001" step="0.00001" v-model="positionForm.entryRate"
-                  class="form-control">
-              </td>
-              <td><button @click="addPosition" class="btn btn-primary">追加</button></td>
-            </tr>
-            <tr v-for="(position, index) in positions">
-              <td>{{ position.pair }}</td>
-              <td>{{ position.action }}</td>
-              <td>{{ position.lot }}</td>
-              <td>{{ position.entryRate }}</td>
-              <td><button @click="deletePosition(index)" class="btn btn-danger">削除</button></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+    <div class="container">
+      <p>保有ポジション</p>
+      <table class="table">
+        <thead class="thead-dark">
+          <tr>
+            <th>通貨ペア</th>
+            <th>売買</th>
+            <th>ロット</th>
+            <th>エントリーレート</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><select name="" id="" v-model='positionForm.pair' @change="setEntryRate" class="form-control">
+                <option v-for="pair in pairs">
+                  {{ pair.name }}
+                </option>
+              </select>
+            </td>
+            <td>
+              <label><input type="radio" name="action" value="buy" v-model="positionForm.action"> buy</label>
+              <label><input type="radio" name="action" value="sell" v-model="positionForm.action"> sell</label>
+            </td>
+            <td><input type="number" min="0.01" step="0.01" v-model="positionForm.lot" class="form-control"></td>
+            <td><input type="number" min="0.00001" step="0.00001" v-model="positionForm.entryRate" class="form-control">
+            </td>
+            <td><button @click="addPosition" class="btn btn-primary">追加</button></td>
+          </tr>
+          <tr v-for="(position, index) in positions">
+            <td>{{ position.pair }}</td>
+            <td>{{ position.action }}</td>
+            <td>{{ position.lot }}</td>
+            <td>{{ position.entryRate }}</td>
+            <td><button @click="deletePosition(index)" class="btn btn-danger">削除</button></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
     <footer class="bg-light mt-5 py-3">
@@ -148,7 +160,7 @@
 
       </div>
     </footer>
-    <!-- <pre>{{ $data }}</pre> -->
+    <pre>{{ $data }}</pre>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>

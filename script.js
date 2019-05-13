@@ -52,7 +52,10 @@ const app = new Vue({
     positionForm,
 
     pairs,
-    pairsFromAPI: null
+    pairsFromAPI: null,
+
+    myfxbookEmail: '',
+    myfxbookPassword: ''
   },
   computed: {
     unrealizedValue: function () {
@@ -204,6 +207,16 @@ const app = new Vue({
       } else {
         this.pairs[index].rateExpected = Math.round(1 / this.pairsFromAPI[keyCurrency] * 100000) / 100000
       }
+    },
+    loginMyfxbook: function () {
+      const params = { email: this.myfxbookEmail, password: this.myfxbookPassword }
+      axios.get('https://www.myfxbook.com/api/login.json?debug=1', { params })
+        .then(function (response) {
+          console.log(response)
+        })
+        .catch(function (error) {
+          console.log('Error!')
+        })
     }
   },
   filters: {
