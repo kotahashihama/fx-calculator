@@ -73,12 +73,11 @@
             <li class="list-group-item">
               <p>仮定レート</p>
 
-              <div v-for="(currencyInfoItem, index) in currencyInfo">
+              <div v-for="(pair, index) in pairs">
                 <div class="form-group">
-                  <label for="">{{ currencyInfoItem.name }}</label>
+                  <label for="">{{ pair.name }}</label>
                   <div class="input-group">
-                    <input type="number" min="0.00001" step="0.00001" v-model="currencyInfoItem.rateExpected"
-                      class="form-control">
+                    <input type="number" min="0.00001" step="0.00001" v-model="pair.rateExpected" class="form-control">
                     <div class="input-group-append">
                       <button @click="setCurrentRateExpected(index)" class="btn btn-outline-primary">現在値を取得</button>
                     </div>
@@ -104,18 +103,19 @@
           </thead>
           <tbody>
             <tr>
-              <td><select name="" id="" v-model='form.pair' @change="setEntryRate" class="form-control">
-                  <option v-for="currencyInfoItem in currencyInfo">
-                    {{ currencyInfoItem.name }}
+              <td><select name="" id="" v-model='positionForm.pair' @change="setEntryRate" class="form-control">
+                  <option v-for="pair in pairs">
+                    {{ pair.name }}
                   </option>
                 </select>
               </td>
               <td>
-                <label><input type="radio" name="action" value="buy" v-model="form.action"> buy</label>
-                <label><input type="radio" name="action" value="sell" v-model="form.action"> sell</label>
+                <label><input type="radio" name="action" value="buy" v-model="positionForm.action"> buy</label>
+                <label><input type="radio" name="action" value="sell" v-model="positionForm.action"> sell</label>
               </td>
-              <td><input type="number" min="0.01" step="0.01" v-model="form.lot" class="form-control"></td>
-              <td><input type="number" min="0.00001" step="0.00001" v-model="form.entryRate" class="form-control">
+              <td><input type="number" min="0.01" step="0.01" v-model="positionForm.lot" class="form-control"></td>
+              <td><input type="number" min="0.00001" step="0.00001" v-model="positionForm.entryRate"
+                  class="form-control">
               </td>
               <td><button @click="addPosition" class="btn btn-primary">追加</button></td>
             </tr>
