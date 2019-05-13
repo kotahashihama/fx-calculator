@@ -145,7 +145,7 @@ const app = new Vue({
         return 0
       }
     },
-    difference: function () {
+    balanceGap: function () {
       return Math.round(this.targetMarginLevel * this.necessaryMargin / 100 - this.equity)
     }
   },

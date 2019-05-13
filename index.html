@@ -44,14 +44,19 @@
             </li>
             <li class="list-group-item">
               <p>証拠金維持率</p>
-              <p>{{ marginLevel | withDelimiter }} ％</p>
-              <p v-show="marginLevel < 100" class="text-danger"><i class="fas fa-exclamation-triangle"></i>
-                100%を下回っています！
-              </p>
-              <p>維持率<input type="number" min="0" v-model="targetMarginLevel" class="form-control">
-                <span v-show="difference >= 0">％にするには{{ difference }}円の入金が必要です</span>
-                <span v-show="difference < 0">％にするには{{ -difference }}円の出金が必要です</span>
-              </p>
+              <div v-show="positions.length <= 0">
+                ポジションを追加してください
+              </div>
+              <div v-show="positions.length > 0">
+                <p>{{ marginLevel | withDelimiter }} ％</p>
+                <p v-show="marginLevel < 100" class="text-danger"><i class="fas fa-exclamation-triangle"></i>
+                  100%を下回っています！
+                </p>
+                <p>維持率<input type="number" min="0" v-model="targetMarginLevel" class="form-control">
+                  <span v-show="balanceGap >= 0">％にするには{{ balanceGap }}円の入金が必要です</span>
+                  <span v-show="balanceGap < 0">％にするには{{ -balanceGap }}円の出金が必要です</span>
+                </p>
+              </div>
             </li>
             <li class="list-group-item">
               <p>必要証拠金</p>
