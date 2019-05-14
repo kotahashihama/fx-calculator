@@ -209,13 +209,23 @@ const app = new Vue({
       }
     },
     loginMyfxbook: function () {
+      const headers = {
+        'Content-Type': 'application/json;charset=UTF-8',
+        'Access-Control-Allow-Origin': '*',
+      }
       const params = { email: this.myfxbookEmail, password: this.myfxbookPassword }
-      axios.get('https://www.myfxbook.com/api/login.json?debug=1', { params })
+      axios.get('https://www.myfxbook.com/api/login.json?debug=1', { params }, {
+        headers: {
+          "Content-Type": "application/json",
+          'Access-Control-Allow-Origin': '*'
+        },
+        data: {}
+      })
         .then(function (response) {
           console.log(response)
         })
         .catch(function (error) {
-          console.log('Error!')
+          console.log(error)
         })
     }
   },
