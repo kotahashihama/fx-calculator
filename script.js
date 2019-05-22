@@ -55,7 +55,17 @@ const app = new Vue({
     pairsFromAPI: null,
 
     myfxbookEmail: '',
-    myfxbookPassword: ''
+    myfxbookPassword: '',
+    myfxbookSession: '',
+    myfxbookId: '',
+    openTrades: [
+      {
+        pair: "USDJPY",
+        action: 'buy',
+        lot: 0.01,
+        entryRate: 0
+      }
+    ]
   },
   computed: {
     unrealizedValue: function () {
@@ -207,6 +217,33 @@ const app = new Vue({
       } else {
         this.pairs[index].rateExpected = Math.round(1 / this.pairsFromAPI[keyCurrency] * 100000) / 100000
       }
+    },
+    loginMyfxbook: function () {
+      const params = { email: this.myfxbookEmail, password: this.myfxbookPassword }
+
+      axios.get('https://kotahashihama.com/fx-calculator/myfxbook-login.php', { params })
+        .then(function (response) {
+          app.myfxbookSession = response.data.session
+          app.getOpenTrades()
+        })
+    },
+    getOpenTrades: function () {
+      const params = { session: this.myfxbookSession, id: this.myfxbookId }
+
+      axios.get('https://kotahashihama.com/fx-calculator/myfxbook-trades.php', { params })
+        .then(function (response) {
+          const openTrades = response.data.openTrades
+
+          console.log(openTrades)
+          for (let i = 0; i < openTrades.length; i++) {
+            app.positions.push({
+              pair: openTrades[i].symbol,
+              action: openTrades[i].action.toLowerCase(),
+              lot: openTrades[i].sizing.value,
+              entryRate: openTrades[i].openPrice
+            })
+          }
+        })
     }
   },
   filters: {
