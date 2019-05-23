@@ -11,7 +11,7 @@ https://kotahashihama.github.io/fx-calculator/
 
 ## 使用技術
 - 言語・・・JavaScript
-- フレームワーク・・・Vue.js
+- フレームワーク・・・Vue.js、Bootstrap
 - ライブラリ・・・axios
 
 ## バージョン
