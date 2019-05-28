@@ -1,9 +1,9 @@
 <template>
   <v-container>
     <ul>
-      <li>残高 {{ $store.state.balance | withDelimiter }} 円</li>
-      <li>ピップス {{ $store.getters.pips }} pips</li>
-      <li>有効証拠金 {{ $store.getters.equity | withDelimiter }} 円</li>
+      <li>残高 {{ balance | withDelimiter }} 円</li>
+      <li>ピップス {{ pips }} pips</li>
+      <li>有効証拠金 {{ equity | withDelimiter }} 円</li>
       <li v-show="positions.length > 0">証拠金維持率 {{ marginLevel | withDelimiter }} ％</li>
       <li>必要証拠金 {{ necessaryMargin | withDelimiter }} 円</li>
     </ul>
@@ -15,24 +15,19 @@
       <v-radio value="japan" label="日本"></v-radio>
     </v-radio-group>
 
-    <v-select
-      :items="$store.state.leverages[broker]"
-      label="レバレッジ"
-      v-model="leverage[broker]"
-      suffix="倍"
-    ></v-select>
+    <v-select :items="leverages[broker]" label="レバレッジ" v-model="leverage[broker]" suffix="倍"></v-select>
 
     <template v-for="(pair, index) in pairs">
       <v-text-field :key="index" v-model.number="pair.rateExpected" :label="pair.name" required></v-text-field>
-      <v-btn color="info">現在レート</v-btn>
+      <v-btn color="info" @click="setCurrentRate(index)">現在レート</v-btn>
     </template>
 
     <v-data-table :headers="positionHeaders" :items="positions" class="elevation-1">
       <template v-slot:items="props">
         <td>{{ props.item.pair }}</td>
         <td>{{ props.item.action }}</td>
-        <td class="text-xs-right">{{ props.item.setEntryRate }}</td>
         <td class="text-xs-right">{{ props.item.lot }}</td>
+        <td class="text-xs-right">{{ props.item.entryRate }}</td>
         <td class="justify-center layout px-0">
           <v-icon small class="mr-2" @click="editItem(props.item)">edit</v-icon>
           <v-icon small @click="deleteItem(props.item)">delete</v-icon>
@@ -82,11 +77,21 @@ const positionForm = {
 export default {
   data() {
     return {
+      balance: 200000,
+      broker: "overseas",
+      leverage: {
+        overseas: 1000,
+        japan: 25
+      },
       targetMarginLevel: 1000,
 
       tradingUnits: {
         overseas: 100000,
         japan: 10000
+      },
+      leverages: {
+        overseas: [1000, 888, 500, 200],
+        japan: [25, 20, 10, 5]
       },
 
       positionHeaders: [
@@ -95,8 +100,8 @@ export default {
           value: "pair"
         },
         { text: "売買", value: "action" },
-        { text: "レート", value: "entryRate" },
-        { text: "ロット", value: "lot" }
+        { text: "ロット", value: "lot" },
+        { text: "レート", value: "entryRate" }
       ],
       positions: [
         {
@@ -138,32 +143,7 @@ export default {
     };
   },
   computed: {
-    balance: {
-      get() {
-        return this.$store.state.balance;
-      },
-      set(value) {
-        this.$store.commit("updateBalance", value);
-      }
-    },
-    broker: {
-      get() {
-        return this.$store.state.broker;
-      },
-      set(value) {
-        this.$store.commit("updateBroker", value);
-      }
-    },
-    leverage: {
-      get() {
-        return this.$store.state.leverage;
-      },
-      set(value) {
-        this.$store.commit("updateLeverage", value);
-      }
-    },
-
-    unrealizedValue: function() {
+    unrealizedValue() {
       let unrealizedValue = 0;
 
       for (let i = 0; i < this.positions.length; i++) {
@@ -206,7 +186,7 @@ export default {
 
       return Math.round(unrealizedValue);
     },
-    pips: function() {
+    pips() {
       let pips = 0;
 
       for (let i = 0; i < this.positions.length; i++) {
@@ -238,10 +218,10 @@ export default {
 
       return Math.round(pips * 10) / 10;
     },
-    equity: function() {
+    equity() {
       return this.balance + this.unrealizedValue;
     },
-    necessaryMargin: function() {
+    necessaryMargin() {
       let necessaryMargin = 0;
 
       for (let i = 0; i < this.positions.length; i++) {
@@ -272,14 +252,14 @@ export default {
 
       return Math.round(necessaryMargin);
     },
-    marginLevel: function() {
+    marginLevel() {
       if (this.positions.length) {
         return Math.round((this.equity / this.necessaryMargin) * 10000) / 100;
       } else {
-        return 0;
+        return this.equity;
       }
     },
-    balanceGap: function() {
+    balanceGap() {
       return Math.round(
         (this.targetMarginLevel * this.necessaryMargin) / 100 - this.equity
       );
@@ -325,18 +305,6 @@ export default {
       }
     },
     setCurrentRate: function(index) {
-      const pair = this.pairs[index].name;
-      const keyCurrency = this.pairs[index].name.slice(0, 3);
-
-      if (pair === "USDJPY") {
-        this.pairs[index].rate =
-          Math.round(this.pairsFromAPI.JPY * 1000) / 1000;
-      } else {
-        this.pairs[index].rate =
-          Math.round((1 / this.pairsFromAPI[keyCurrency]) * 100000) / 100000;
-      }
-    },
-    setCurrentRateExpected: function(index) {
       const pair = this.pairs[index].name;
       const keyCurrency = this.pairs[index].name.slice(0, 3);
 
@@ -405,7 +373,6 @@ export default {
     axios
       .get("https://api.ratesapi.io/api/latest?base=USD")
       .then(function(response) {
-        console.log(response);
         self.pairsFromAPI = response.data.rates;
         self.getCurrentRates();
         self.positionForm.entryRate =
@@ -414,8 +381,4 @@ export default {
   }
 };
 </script>
-
-<style lang="sass" scoped>
-
-</style>
 
