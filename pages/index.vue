@@ -1,43 +1,61 @@
 <template>
-  <v-container>
-    <ul>
-      <li>残高 {{ balance | withDelimiter }} 円</li>
-      <li>ピップス {{ pips }} pips</li>
-      <li>有効証拠金 {{ equity | withDelimiter }} 円</li>
-      <li v-show="positions.length > 0">証拠金維持率 {{ marginLevel | withDelimiter }} ％</li>
-      <li>必要証拠金 {{ necessaryMargin | withDelimiter }} 円</li>
-    </ul>
+  <v-container grid-list-lg>
+    <v-layout row wrap>
+      <v-flex xs12 sm6>
+        <v-card>
+          <v-card-text>
+            <ul>
+              <li>残高 {{ balance | withDelimiter }} 円</li>
+              <li>ピップス {{ pips }} pips</li>
+              <li>有効証拠金 {{ equity | withDelimiter }} 円</li>
+              <li v-show="positions.length > 0">証拠金維持率 {{ marginLevel | withDelimiter }} ％</li>
+              <li>必要証拠金 {{ necessaryMargin | withDelimiter }} 円</li>
+            </ul>
+          </v-card-text>
+        </v-card>
 
-    <v-text-field v-model.number="balance" label="残高" suffix="円" required></v-text-field>
+        <v-text-field v-model.number="balance" label="残高" suffix="円" required></v-text-field>
 
-    <v-radio-group v-model="broker">
-      <v-radio value="overseas" label="海外"></v-radio>
-      <v-radio value="japan" label="日本"></v-radio>
-    </v-radio-group>
+        <v-radio-group v-model="broker">
+          <v-radio value="overseas" label="海外"></v-radio>
+          <v-radio value="japan" label="日本"></v-radio>
+        </v-radio-group>
 
-    <v-select :items="leverages[broker]" label="レバレッジ" v-model="leverage[broker]" suffix="倍"></v-select>
+        <v-select :items="leverages[broker]" label="レバレッジ" v-model="leverage[broker]" suffix="倍"></v-select>
+      </v-flex>
 
-    <template v-for="(pair, index) in pairs">
-      <v-text-field :key="index" v-model.number="pair.rateExpected" :label="pair.name" required></v-text-field>
-      <v-btn color="info" @click="setCurrentRate(index)">現在レート</v-btn>
-    </template>
+      <v-flex xs12 sm6>
+        <div v-for="(pair, index) in pairs" :key="index">
+          <v-layout row>
+            <v-flex grow>
+              <v-text-field v-model.number="pair.rateExpected" :label="pair.name" required></v-text-field>
+            </v-flex>
+            <v-flex shrink>
+              <v-btn color="info" @click="setCurrentRate(index)">現在値</v-btn>
+            </v-flex>
+          </v-layout>
+        </div>
+      </v-flex>
 
-    <v-data-table :headers="positionHeaders" :items="positions" class="elevation-1">
-      <template v-slot:items="props">
-        <td>{{ props.item.pair }}</td>
-        <td>{{ props.item.action }}</td>
-        <td class="text-xs-right">{{ props.item.lot }}</td>
-        <td class="text-xs-right">{{ props.item.entryRate }}</td>
-        <td class="justify-center layout px-0">
-          <v-icon small class="mr-2" @click="editItem(props.item)">edit</v-icon>
-          <v-icon small @click="deleteItem(props.item)">delete</v-icon>
-        </td>
-      </template>
-      <template v-slot:no-data>
-        <v-btn color="primary" @click="initialize">Reset</v-btn>
-      </template>
-    </v-data-table>
-    <!-- <pre>{{ $data }}</pre> -->
+      <v-flex xs12>
+        <v-data-table :headers="positionHeaders" :items="positions" class="elevation-1">
+          <template v-slot:items="props">
+            <td>{{ props.item.pair }}</td>
+            <td>{{ props.item.action }}</td>
+            <td class="text-xs-right">{{ props.item.lot }}</td>
+            <td class="text-xs-right">{{ props.item.entryRate }}</td>
+            <td class="justify-center layout px-0">
+              <v-icon small class="mr-2" @click="editItem(props.item)">edit</v-icon>
+              <v-icon small @click="deleteItem(props.item)">delete</v-icon>
+            </td>
+          </template>
+          <template v-slot:no-data>
+            <v-btn color="primary" @click="initialize">Reset</v-btn>
+          </template>
+        </v-data-table>
+      </v-flex>
+      <!-- <pre>{{ $data }}</pre> -->
+    </v-layout>
   </v-container>
 </template>
 
