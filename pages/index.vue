@@ -438,11 +438,11 @@ export default {
         })
         .then(function(response) {
           if (response.data.error === false) {
-            console.log(response);
             const openTrades = response.data.openTrades;
 
+            self.positions = [];
+
             for (let i = 0; i < openTrades.length; i++) {
-              self.positions = [];
               self.positions.push({
                 pair: openTrades[i].symbol,
                 action: openTrades[i].action.toLowerCase(),
