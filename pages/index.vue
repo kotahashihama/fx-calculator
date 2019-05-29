@@ -334,19 +334,6 @@ export default {
 
       this.editedPosition.entryRate = pairInfo.rate;
     },
-    addPosition: function() {
-      this.positions.push({
-        pair: this.defaultPosition.pair,
-        action: this.defaultPosition.action,
-        lot: this.defaultPosition.lot,
-        entryRate: this.defaultPosition.entryRate
-      });
-    },
-    deletePosition: function(index) {
-      if (confirm("削除してもよろしいですか？")) {
-        this.positions.splice(index, 1);
-      }
-    },
     getCurrentRates: function() {
       for (let i = 0; i < this.pairs.length; i++) {
         const pair = this.pairs[i].name;
@@ -422,7 +409,7 @@ export default {
 
     deletePosition(item) {
       const index = this.positions.indexOf(item);
-      confirm("Are you sure you want to delete this item?") &&
+      confirm("本当に削除してもよろしいですか？") &&
         this.positions.splice(index, 1);
     },
 
@@ -456,6 +443,8 @@ export default {
       .then(function(response) {
         self.pairsFromAPI = response.data.rates;
         self.getCurrentRates();
+        self.defaultPosition.entryRate =
+          Math.round((1 / self.pairsFromAPI["EUR"]) * 100000) / 100000;
         self.editedPosition.entryRate =
           Math.round((1 / self.pairsFromAPI["EUR"]) * 100000) / 100000;
       });
