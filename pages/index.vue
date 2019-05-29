@@ -28,6 +28,10 @@
                     <v-btn color="primary" dark class="mb-2" v-on="on">追加</v-btn>
                   </template>
                   <v-card>
+                    <v-card-title>
+                      <span class="headline">{{ formTitle }}</span>
+                    </v-card-title>
+
                     <v-card-text>
                       <v-container grid-list-md>
                         <v-layout wrap>
@@ -77,6 +81,27 @@
                   </td>
                 </template>
               </v-data-table>
+            </v-card>
+          </v-flex>
+
+          <v-flex>
+            <v-card>
+              <v-card-title>
+                <span class="headline">ポジション取得（Myfxbook）</span>
+              </v-card-title>
+
+              <v-card-text>
+                <template v-if="myfxbook.session <= 0">
+                  <v-text-field v-model="myfxbook.email" label="メールアドレス"></v-text-field>
+                  <v-text-field v-model="myfxbook.password" label="パスワード"></v-text-field>
+                  <v-btn color="primary" @click="loginMyfxbook">ログイン</v-btn>
+                </template>
+                <template v-else>
+                  <p>{{ myfxbook.email }}としてログイン中</p>
+                  <v-text-field v-model="myfxbook.accountNumber" label="Myfxbook口座番号"></v-text-field>
+                  <v-btn color="primary" @click="getOpenTrades">取得</v-btn>
+                </template>
+              </v-card-text>
             </v-card>
           </v-flex>
         </v-layout>
@@ -183,18 +208,20 @@ export default {
       pairs,
       pairsFromAPI: null,
 
-      myfxbookEmail: "",
-      myfxbookPassword: "",
-      myfxbookSession: "",
-      myfxbookId: "",
-      openTrades: [
-        {
-          pair: "USDJPY",
-          action: "buy",
-          lot: 0.01,
-          entryRate: 0
-        }
-      ]
+      myfxbook: {
+        email: "",
+        password: "",
+        session: "",
+        accountNumber: "",
+        openTrades: [
+          {
+            pair: "USDJPY",
+            action: "buy",
+            lot: 0.01,
+            entryRate: 0
+          }
+        ]
+      }
     };
   },
   computed: {
@@ -318,6 +345,11 @@ export default {
       return Math.round(
         (this.targetMarginLevel * this.necessaryMargin) / 100 - this.equity
       );
+    },
+    formTitle() {
+      return this.editedIndex === -1
+        ? "新規ポジションの追加"
+        : "ポジションの編集";
     }
   },
   watch: {
@@ -366,8 +398,8 @@ export default {
     loginMyfxbook: function() {
       const self = this;
       const params = {
-        email: this.myfxbookEmail,
-        password: this.myfxbookPassword
+        email: this.myfxbook.email,
+        password: this.myfxbook.password
       };
 
       axios
@@ -375,29 +407,43 @@ export default {
           params
         })
         .then(function(response) {
-          app.myfxbookSession = response.data.session;
-          app.getOpenTrades();
+          if (response.data.error === false) {
+            self.myfxbook.session = response.data.session;
+            self.getOpenTrades();
+          } else {
+            alert(
+              "ログインできませんでした。メールアドレスとパスワードをもう一度お試しください"
+            );
+          }
         });
     },
     getOpenTrades: function() {
       const self = this;
-      const params = { session: this.myfxbookSession, id: this.myfxbookId };
+      const params = {
+        session: this.myfxbook.session,
+        id: this.myfxbook.accountNumber
+      };
 
       axios
         .get("https://kotahashihama.com/fx-calculator/myfxbook-trades.php", {
           params
         })
         .then(function(response) {
-          const openTrades = response.data.openTrades;
+          if (response.data.error === false) {
+            console.log(response);
+            const openTrades = response.data.openTrades;
 
-          console.log(openTrades);
-          for (let i = 0; i < openTrades.length; i++) {
-            app.positions.push({
-              pair: openTrades[i].symbol,
-              action: openTrades[i].action.toLowerCase(),
-              lot: openTrades[i].sizing.value,
-              entryRate: openTrades[i].openPrice
-            });
+            for (let i = 0; i < openTrades.length; i++) {
+              self.positions = [];
+              self.positions.push({
+                pair: openTrades[i].symbol,
+                action: openTrades[i].action.toLowerCase(),
+                lot: openTrades[i].sizing.value,
+                entryRate: openTrades[i].openPrice
+              });
+            }
+          } else {
+            alert("取得できませんでした。時間をおいてお試しください");
           }
         });
     },
