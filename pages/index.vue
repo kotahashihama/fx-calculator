@@ -5,6 +5,10 @@
         <v-layout column>
           <v-flex>
             <v-card>
+              <v-card-title>
+                <span class="headline">計算結果</span>
+              </v-card-title>
+
               <v-card-text>
                 <ul>
                   <li>残高 {{ balance | withDelimiter }} 円</li>
@@ -108,6 +112,10 @@
       </v-flex>
 
       <v-flex xs12 sm6>
+        <p>
+          <span class="headline">条件</span>
+        </p>
+
         <v-text-field v-model.number="balance" label="残高" suffix="円" required></v-text-field>
 
         <v-radio-group v-model="broker">

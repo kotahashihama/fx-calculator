@@ -1,7 +1,7 @@
 {
-  "name": "fx-calculator",
+  "name": "ポジション計算機",
   "version": "0.0.1",
-  "description": "FXの含み損益・証拠金等を俯瞰できる計算アプリ",
+  "description": "FXの含み損益・証拠金等を俯瞰できる計算アプリです。",
   "author": "Kota Hashihama",
   "private": true,
   "scripts": {
