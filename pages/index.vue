@@ -2,18 +2,87 @@
   <v-container grid-list-lg>
     <v-layout row wrap>
       <v-flex xs12 sm6>
-        <v-card>
-          <v-card-text>
-            <ul>
-              <li>残高 {{ balance | withDelimiter }} 円</li>
-              <li>ピップス {{ pips }} pips</li>
-              <li>有効証拠金 {{ equity | withDelimiter }} 円</li>
-              <li v-show="positions.length > 0">証拠金維持率 {{ marginLevel | withDelimiter }} ％</li>
-              <li>必要証拠金 {{ necessaryMargin | withDelimiter }} 円</li>
-            </ul>
-          </v-card-text>
-        </v-card>
+        <v-layout column>
+          <v-flex>
+            <v-card>
+              <v-card-text>
+                <ul>
+                  <li>残高 {{ balance | withDelimiter }} 円</li>
+                  <li>ピップス {{ pips }} pips</li>
+                  <li>有効証拠金 {{ equity | withDelimiter }} 円</li>
+                  <li v-show="positions.length > 0">証拠金維持率 {{ marginLevel | withDelimiter }} ％</li>
+                  <li>必要証拠金 {{ necessaryMargin | withDelimiter }} 円</li>
+                </ul>
+              </v-card-text>
+            </v-card>
+          </v-flex>
 
+          <v-flex>
+            <v-card>
+              <v-toolbar flat>
+                <v-toolbar-title>保有ポジション</v-toolbar-title>
+                <v-divider class="mx-2" inset vertical></v-divider>
+                <v-spacer></v-spacer>
+                <v-dialog v-model="dialog" max-width="500px">
+                  <template v-slot:activator="{ on }">
+                    <v-btn color="primary" dark class="mb-2" v-on="on">追加</v-btn>
+                  </template>
+                  <v-card>
+                    <v-card-text>
+                      <v-container grid-list-md>
+                        <v-layout wrap>
+                          <v-flex xs12 sm6>
+                            <v-select
+                              :items="pairs"
+                              item-text="name"
+                              label="通貨ペア"
+                              v-model="editedPosition.pair"
+                              @change="setEntryRate"
+                            ></v-select>
+                          </v-flex>
+                          <v-flex xs12 sm6>
+                            <v-radio-group v-model="editedPosition.action">
+                              <v-radio label="買" value="buy"></v-radio>
+                              <v-radio label="売" value="sell"></v-radio>
+                            </v-radio-group>
+                          </v-flex>
+                          <v-flex xs12 sm6>
+                            <v-text-field v-model="editedPosition.lot" label="ロット"></v-text-field>
+                          </v-flex>
+                          <v-flex xs12 sm6>
+                            <v-text-field v-model="editedPosition.entryRate" label="レート"></v-text-field>
+                          </v-flex>
+                        </v-layout>
+                      </v-container>
+                    </v-card-text>
+
+                    <v-card-actions>
+                      <v-spacer></v-spacer>
+                      <v-btn color="blue darken-1" flat @click="close">キャンセル</v-btn>
+                      <v-btn color="blue darken-1" flat @click="save">追加</v-btn>
+                    </v-card-actions>
+                  </v-card>
+                </v-dialog>
+              </v-toolbar>
+
+              <v-data-table :headers="positionHeaders" :items="positions">
+                <template v-slot:items="props">
+                  <td>{{ props.item.pair }}</td>
+                  <td>{{ props.item.action }}</td>
+                  <td class="text-xs-right">{{ props.item.lot }}</td>
+                  <td class="text-xs-right">{{ props.item.entryRate }}</td>
+                  <td class="justify-center layout px-0">
+                    <v-icon small class="mr-2" @click="editPosition(props.item)">edit</v-icon>
+                    <v-icon small @click="deletePosition(props.item)">delete</v-icon>
+                  </td>
+                </template>
+              </v-data-table>
+            </v-card>
+          </v-flex>
+        </v-layout>
+      </v-flex>
+
+      <v-flex xs12 sm6>
         <v-text-field v-model.number="balance" label="残高" suffix="円" required></v-text-field>
 
         <v-radio-group v-model="broker">
@@ -22,9 +91,7 @@
         </v-radio-group>
 
         <v-select :items="leverages[broker]" label="レバレッジ" v-model="leverage[broker]" suffix="倍"></v-select>
-      </v-flex>
 
-      <v-flex xs12 sm6>
         <div v-for="(pair, index) in pairs" :key="index">
           <v-layout row>
             <v-flex grow>
@@ -36,25 +103,7 @@
           </v-layout>
         </div>
       </v-flex>
-
-      <v-flex xs12>
-        <v-data-table :headers="positionHeaders" :items="positions" class="elevation-1">
-          <template v-slot:items="props">
-            <td>{{ props.item.pair }}</td>
-            <td>{{ props.item.action }}</td>
-            <td class="text-xs-right">{{ props.item.lot }}</td>
-            <td class="text-xs-right">{{ props.item.entryRate }}</td>
-            <td class="justify-center layout px-0">
-              <v-icon small class="mr-2" @click="editItem(props.item)">edit</v-icon>
-              <v-icon small @click="deleteItem(props.item)">delete</v-icon>
-            </td>
-          </template>
-          <template v-slot:no-data>
-            <v-btn color="primary" @click="initialize">Reset</v-btn>
-          </template>
-        </v-data-table>
-      </v-flex>
-      <!-- <pre>{{ $data }}</pre> -->
+      <!-- {{ $data }} -->
     </v-layout>
   </v-container>
 </template>
@@ -85,16 +134,10 @@ const pairs = [
   }
 ];
 
-const positionForm = {
-  pair: pairs[0].name,
-  action: "buy",
-  lot: 0.01,
-  entryRate: 0
-};
-
 export default {
   data() {
     return {
+      dialog: false,
       balance: 200000,
       broker: "overseas",
       leverage: {
@@ -114,34 +157,28 @@ export default {
 
       positionHeaders: [
         {
-          text: "ペア",
+          text: "通貨ペア",
           value: "pair"
         },
         { text: "売買", value: "action" },
         { text: "ロット", value: "lot" },
-        { text: "レート", value: "entryRate" }
+        { text: "レート", value: "entryRate" },
+        { text: "操作", value: "operate" }
       ],
-      positions: [
-        {
-          pair: "USDJPY",
-          action: "buy",
-          lot: 0.01,
-          entryRate: 110
-        },
-        {
-          pair: "EURUSD",
-          action: "sell",
-          lot: 0.02,
-          entryRate: 1.12
-        },
-        {
-          pair: "USDJPY",
-          action: "buy",
-          lot: 0.01,
-          entryRate: 110
-        }
-      ],
-      positionForm,
+      positions: [],
+      defaultPosition: {
+        pair: pairs[0].name,
+        action: "buy",
+        lot: 0.01,
+        entryRate: 0
+      },
+      editedPosition: {
+        pair: "EURUSD",
+        action: "buy",
+        lot: 0.01,
+        entryRate: 0
+      },
+      editedIndex: -1,
 
       pairs,
       pairsFromAPI: null,
@@ -283,21 +320,26 @@ export default {
       );
     }
   },
+  watch: {
+    dialog(val) {
+      val || this.close();
+    }
+  },
   methods: {
     setEntryRate: function() {
-      const pair = this.positionForm.pair;
+      const pair = this.editedPosition.pair;
       const pairInfo = this.pairs.find(function(pairInfo) {
         return pairInfo.name === pair;
       });
 
-      this.positionForm.entryRate = pairInfo.rate;
+      this.editedPosition.entryRate = pairInfo.rate;
     },
     addPosition: function() {
       this.positions.push({
-        pair: this.positionForm.pair,
-        action: this.positionForm.action,
-        lot: this.positionForm.lot,
-        entryRate: this.positionForm.entryRate
+        pair: this.defaultPosition.pair,
+        action: this.defaultPosition.action,
+        lot: this.defaultPosition.lot,
+        entryRate: this.defaultPosition.entryRate
       });
     },
     deletePosition: function(index) {
@@ -372,12 +414,33 @@ export default {
           }
         });
     },
+    editPosition(item) {
+      this.editedIndex = this.positions.indexOf(item);
+      this.editedPosition = Object.assign({}, item);
+      this.dialog = true;
+    },
+
+    deletePosition(item) {
+      const index = this.positions.indexOf(item);
+      confirm("Are you sure you want to delete this item?") &&
+        this.positions.splice(index, 1);
+    },
+
     close() {
       this.dialog = false;
       setTimeout(() => {
-        this.editedItem = Object.assign({}, this.defaultItem);
+        this.editedPosition = Object.assign({}, this.defaultPosition);
         this.editedIndex = -1;
       }, 300);
+    },
+
+    save() {
+      if (this.editedIndex > -1) {
+        Object.assign(this.positions[this.editedIndex], this.editedPosition);
+      } else {
+        this.positions.push(this.editedPosition);
+      }
+      this.close();
     }
   },
   filters: {
@@ -393,7 +456,7 @@ export default {
       .then(function(response) {
         self.pairsFromAPI = response.data.rates;
         self.getCurrentRates();
-        self.positionForm.entryRate =
+        self.editedPosition.entryRate =
           Math.round((1 / self.pairsFromAPI["EUR"]) * 100000) / 100000;
       });
   }
