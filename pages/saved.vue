@@ -38,8 +38,6 @@
 </template>
 
 <script>
-import firebase from "@/plugins/firebase";
-
 export default {
   mounted: function() {
     this.$store.dispatch("checkAuthentication");

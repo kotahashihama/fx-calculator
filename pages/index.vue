@@ -1,6 +1,28 @@
 <template>
   <v-container grid-list-lg>
     <v-layout row wrap>
+      <v-flex xs12>
+        <template v-if="$store.state.isWaiting">
+          <v-flex>
+            <p>読み込み中...</p>
+          </v-flex>
+        </template>
+        <template v-else>
+          <template v-if="!$store.state.isLogin">
+            <v-flex>
+              <p>保存機能を使うにはログインが必要です。</p>
+              <v-btn @click="$store.commit('twitterLogin')" color="primary">Twitterでログイン</v-btn>
+            </v-flex>
+          </template>
+          <template v-else>
+            <v-flex>
+              <p>{{ $store.state.user.displayName }}でログイン中</p>
+              <v-btn @click="$store.commit('logOut')">ログアウト</v-btn>
+            </v-flex>
+          </template>
+        </template>
+      </v-flex>
+
       <v-flex xs12 sm6>
         <v-layout column>
           <v-flex>

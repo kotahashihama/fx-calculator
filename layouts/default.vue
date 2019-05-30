@@ -4,12 +4,16 @@
       <v-toolbar flat class="transparent">
         <v-list class="pa-0">
           <v-list-tile avatar>
-            <v-list-tile-avatar>
+            <v-list-tile-avatar v-if="$store.state.isLogin">
+              <img :src="$store.state.user.photoURL">
+            </v-list-tile-avatar>
+            <v-list-tile-avatar v-else>
               <img src="https://randomuser.me/api/portraits/men/85.jpg">
             </v-list-tile-avatar>
 
             <v-list-tile-content>
-              <v-list-tile-title>ユーザー</v-list-tile-title>
+              <v-list-tile-title v-if="$store.state.isLogin">{{ $store.state.user.displayName }}</v-list-tile-title>
+              <v-list-tile-title v-else>ゲスト</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
         </v-list>
@@ -75,6 +79,9 @@ export default {
       rightDrawer: false,
       title: "ポジション計算機"
     };
+  },
+  mounted: function() {
+    this.$store.dispatch("checkAuthentication");
   }
 };
 </script>
