@@ -11,12 +11,13 @@
     "generate": "nuxt generate"
   },
   "dependencies": {
+    "@nuxtjs/axios": "^5.3.6",
+    "@nuxtjs/pwa": "^2.6.0",
     "cross-env": "^5.2.0",
+    "firebase": "^6.1.0",
     "nuxt": "^2.4.0",
     "vuetify": "^1.5.5",
-    "vuetify-loader": "^1.2.1",
-    "@nuxtjs/axios": "^5.3.6",
-    "@nuxtjs/pwa": "^2.6.0"
+    "vuetify-loader": "^1.2.1"
   },
   "devDependencies": {
     "node-sass": "^4.12.0",

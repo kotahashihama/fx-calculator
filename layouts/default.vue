@@ -57,7 +57,7 @@ export default {
         {
           icon: "storage",
           title: "保存済み",
-          to: "/inspire"
+          to: "/saved"
         },
         {
           icon: "settings",
