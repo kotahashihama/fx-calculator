@@ -22,24 +22,48 @@
           <v-flex>
             <v-card>
               <v-list>
-                <v-list-tile>
-                  <v-list-tile-content>
-                    <v-list-tile-title>タイトルタイトルタイトル</v-list-tile-title>
-                    <v-list-tile-sub-title>2019/05/30</v-list-tile-sub-title>
-                  </v-list-tile-content>
-                </v-list-tile>
+                <template v-for="(calculation, index) in calculations">
+                  <v-list-tile @click="$router.push({ path: `/calculation/${calculation.id}` })">
+                    <v-list-tile-content>
+                      <v-list-tile-title>{{ calculation.title }}</v-list-tile-title>
+                      <v-list-tile-sub-title>{{ calculation.date }}</v-list-tile-sub-title>
+                    </v-list-tile-content>
+                  </v-list-tile>
+                </template>
               </v-list>
             </v-card>
           </v-flex>
         </template>
       </template>
+      {{ $data }}
     </v-layout>
   </v-container>
 </template>
 
 <script>
+import firebase from "firebase";
+
 export default {
-  mounted: function() {
+  data() {
+    return {
+      calculations: []
+    };
+  },
+  created() {
+    // if (this.$store.state.isLogin) {
+    firebase
+      .database()
+      .ref("calculations/" + this.$store.state.user.uid)
+      .once("value")
+      .then(result => {
+        if (result.val()) {
+          this.calculations = result.val();
+        }
+      });
+    console.log(this.$store.state.user.uid);
+    // }
+  },
+  mounted() {
     this.$store.dispatch("checkAuthentication");
   }
 };

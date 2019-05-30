@@ -17,6 +17,7 @@
           <template v-else>
             <v-flex>
               <p>{{ $store.state.user.displayName }}でログイン中</p>
+              <v-btn @click="saveCalculation" color="primary">計算結果を保存</v-btn>
               <v-btn @click="$store.commit('logOut')">ログアウト</v-btn>
             </v-flex>
           </template>
@@ -161,6 +162,7 @@
 
 <script>
 import axios from "axios";
+import firebase from "firebase";
 
 const pairs = [
   {
@@ -239,14 +241,7 @@ export default {
         password: "",
         session: "",
         accountNumber: "",
-        openTrades: [
-          {
-            pair: "USDJPY",
-            action: "buy",
-            lot: 0.01,
-            entryRate: 0
-          }
-        ]
+        openTrades: []
       }
     };
   },
@@ -478,13 +473,11 @@ export default {
       this.editedPosition = Object.assign({}, item);
       this.dialog = true;
     },
-
     deletePosition(item) {
       const index = this.positions.indexOf(item);
       confirm("本当に削除してもよろしいですか？") &&
         this.positions.splice(index, 1);
     },
-
     close() {
       this.dialog = false;
       setTimeout(() => {
@@ -492,7 +485,6 @@ export default {
         this.editedIndex = -1;
       }, 300);
     },
-
     save() {
       if (this.editedIndex > -1) {
         Object.assign(this.positions[this.editedIndex], this.editedPosition);
@@ -500,6 +492,47 @@ export default {
         this.positions.push(this.editedPosition);
       }
       this.close();
+    },
+    saveCalculation() {
+      console.log(this.$store.state.user.uid);
+      firebase
+        .database()
+        .ref("calculations/" + this.$store.state.user.uid)
+        .push({
+          id: "agMqXrnErNfVOtZD",
+          title: "テスト2",
+          date: "2019/05/30",
+          balance: 300000,
+          broker: "japan",
+          leverageIndex: 0,
+          targetMarginLevel: 2000,
+          rateExpected: {
+            EURUSD: 1.1156,
+            USDJPY: 109.278,
+            GBPUSD: 1.26449,
+            AUDUSD: 0.69223
+          },
+          positions: [
+            {
+              pair: "USDJPY",
+              action: "buy",
+              lot: 0.01,
+              entryRate: 109.378
+            },
+            {
+              pair: "EURUSD",
+              action: "buy",
+              lot: 0.01,
+              entryRate: 1.2156
+            },
+            {
+              pair: "GBPUSD",
+              action: "buy",
+              lot: 0.01,
+              entryRate: 1.27449
+            }
+          ]
+        });
     }
   },
   filters: {
