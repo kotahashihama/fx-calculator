@@ -1,22 +1,22 @@
 <template>
   <v-container grid-list-lg>
     <v-layout column>
-      <template v-if="isWaiting">
+      <template v-if="$store.state.isWaiting">
         <v-flex>
           <p>読み込み中...</p>
         </v-flex>
       </template>
       <template v-else>
-        <template v-if="!isLogin">
+        <template v-if="!$store.state.isLogin">
           <v-flex>
-            <p>この機能を使うにはログインが必要です。</p>
-            <v-btn @click="twitterLogin" color="primary">Twitterでログイン</v-btn>
+            <p>保存機能を使うにはログインが必要です。</p>
+            <v-btn @click="$store.commit('twitterLogin')" color="primary">Twitterでログイン</v-btn>
           </v-flex>
         </template>
         <template v-else>
           <v-flex>
-            <p>{{ user.displayName }}でログイン中</p>
-            <v-btn @click="logOut">ログアウト</v-btn>
+            <p>{{ $store.state.user.displayName }}でログイン中</p>
+            <v-btn @click="$store.commit('logOut')">ログアウト</v-btn>
           </v-flex>
 
           <v-flex>
@@ -41,33 +41,8 @@
 import firebase from "@/plugins/firebase";
 
 export default {
-  asyncData() {
-    return {
-      isWaiting: true,
-      isLogin: false,
-      user: []
-    };
-  },
   mounted: function() {
-    firebase.auth().onAuthStateChanged(user => {
-      this.isWaiting = false;
-      if (user) {
-        this.isLogin = true;
-        this.user = user;
-      } else {
-        this.isLogin = false;
-        this.user = [];
-      }
-    });
-  },
-  methods: {
-    twitterLogin() {
-      const provider = new firebase.auth.TwitterAuthProvider();
-      firebase.auth().signInWithRedirect(provider);
-    },
-    logOut() {
-      firebase.auth().signOut();
-    }
+    this.$store.dispatch("checkAuthentication");
   }
 };
 </script>
