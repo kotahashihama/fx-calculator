@@ -35,7 +35,6 @@
           </v-flex>
         </template>
       </template>
-      {{ $data }}
     </v-layout>
   </v-container>
 </template>
@@ -49,8 +48,10 @@ export default {
       calculations: []
     };
   },
-  created() {
-    // if (this.$store.state.isLogin) {
+  mounted() {
+    this.$store.dispatch("checkAuthentication");
+  },
+  beforeUpdate() {
     firebase
       .database()
       .ref("calculations/" + this.$store.state.user.uid)
@@ -60,11 +61,6 @@ export default {
           this.calculations = result.val();
         }
       });
-    console.log(this.$store.state.user.uid);
-    // }
-  },
-  mounted() {
-    this.$store.dispatch("checkAuthentication");
   }
 };
 </script>

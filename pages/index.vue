@@ -494,7 +494,6 @@ export default {
       this.close();
     },
     saveCalculation() {
-      console.log(this.$store.state.user.uid);
       firebase
         .database()
         .ref("calculations/" + this.$store.state.user.uid)
