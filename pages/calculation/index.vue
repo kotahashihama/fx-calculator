@@ -23,7 +23,7 @@
             <v-card>
               <v-list>
                 <template v-for="(calculation, index) in calculations">
-                  <v-list-tile @click="$router.push({ path: `/calculation/${calculation.id}` })">
+                  <v-list-tile @click="$router.push({ path: `/calculation/${calculation.key}` })">
                     <v-list-tile-content>
                       <v-list-tile-title>{{ calculation.title }}</v-list-tile-title>
                       <v-list-tile-sub-title>{{ calculation.date }}</v-list-tile-sub-title>
@@ -54,11 +54,13 @@ export default {
   beforeUpdate() {
     firebase
       .database()
-      .ref("calculations/" + this.$store.state.user.uid)
+      .ref("calculations/")
       .once("value")
       .then(result => {
         if (result.val()) {
-          this.calculations = result.val();
+          this.calculations = Object.values(
+            result.val()[this.$store.state.user.uid]
+          );
         }
       });
   }

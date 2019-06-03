@@ -36,7 +36,6 @@
                       <v-text-field v-model="title" label="タイトル" required></v-text-field>
                     </v-card-text>
                     <v-card-actions>
-                      <v-spacer></v-spacer>
                       <v-btn color="blue darken-1" flat @click="calculationDialog = false">キャンセル</v-btn>
                       <v-btn color="blue darken-1" flat @click="saveCalculation()">保存</v-btn>
                     </v-card-actions>
@@ -532,28 +531,37 @@ export default {
     saveCalculation() {
       const dt = new Date();
       const date = `${dt.getFullYear()}/${dt.getMonth() + 1}/${dt.getDate()}`;
+      const key = firebase
+        .database()
+        .ref("calculations/" + this.$store.state.user.uid)
+        .push().key;
+
+      const newCalculation = {
+        key,
+        title: this.title,
+        date,
+        balance: this.balance,
+        broker: this.broker,
+        leverage: this.leverage[this.broker],
+        targetMarginLevel: this.targetMarginLevel,
+        rateExpected: {
+          EURUSD: pairs[0].rateExpected,
+          USDJPY: pairs[1].rateExpected,
+          GBPUSD: pairs[2].rateExpected,
+          AUDUSD: pairs[3].rateExpected
+        },
+        positions: this.positions
+      };
+
+      if (newCalculation.title === "") {
+        newCalculation.title = "無題";
+      }
 
       firebase
         .database()
         .ref("calculations/" + this.$store.state.user.uid)
-        .push({
-          id: Math.random()
-            .toString(36)
-            .slice(-8),
-          title: this.title,
-          date,
-          balance: this.balance,
-          broker: this.broker,
-          leverage: this.leverage[this.broker],
-          targetMarginLevel: this.targetMarginLevel,
-          rateExpected: {
-            EURUSD: pairs[0].rateExpected,
-            USDJPY: pairs[1].rateExpected,
-            GBPUSD: pairs[2].rateExpected,
-            AUDUSD: pairs[3].rateExpected
-          },
-          positions: this.positions
-        });
+        .child(key)
+        .update(newCalculation);
 
       this.calculationDialog = false;
       this.alert = true;
