@@ -2,6 +2,15 @@
   <v-container grid-list-lg>
     <v-layout row wrap>
       <v-flex xs12>
+        <v-alert
+          :value="alert"
+          dismissible
+          type="success"
+          transition="scale-transition"
+        >計算結果を保存しました！</v-alert>
+      </v-flex>
+
+      <v-flex xs12>
         <template v-if="$store.state.isWaiting">
           <v-flex>
             <p>読み込み中...</p>
@@ -17,7 +26,23 @@
           <template v-else>
             <v-flex>
               <p>{{ $store.state.user.displayName }}でログイン中</p>
-              <v-btn @click="saveCalculation" color="primary">計算結果を保存</v-btn>
+              <v-dialog v-model="calculationDialog" max-width="500px">
+                <template v-slot:activator="{ on }">
+                  <v-btn v-on="on" color="primary">計算結果を保存</v-btn>
+                </template>
+                <v-card>
+                  <v-form>
+                    <v-card-text>
+                      <v-text-field v-model="title" label="タイトル" required></v-text-field>
+                    </v-card-text>
+                    <v-card-actions>
+                      <v-spacer></v-spacer>
+                      <v-btn color="blue darken-1" flat @click="calculationDialog = false">キャンセル</v-btn>
+                      <v-btn color="blue darken-1" flat @click="saveCalculation()">保存</v-btn>
+                    </v-card-actions>
+                  </v-form>
+                </v-card>
+              </v-dialog>
               <v-btn @click="$store.commit('logOut')">ログアウト</v-btn>
             </v-flex>
           </template>
@@ -50,7 +75,7 @@
                 <v-toolbar-title>保有ポジション</v-toolbar-title>
                 <v-divider class="mx-2" inset vertical></v-divider>
                 <v-spacer></v-spacer>
-                <v-dialog v-model="dialog" max-width="500px">
+                <v-dialog v-model="positionDialog" max-width="500px">
                   <template v-slot:activator="{ on }">
                     <v-btn color="primary" dark class="mb-2" v-on="on">追加</v-btn>
                   </template>
@@ -163,6 +188,7 @@
 <script>
 import axios from "axios";
 import firebase from "firebase";
+import { required } from "vuelidate/lib/validators";
 
 const pairs = [
   {
@@ -190,7 +216,17 @@ const pairs = [
 export default {
   data() {
     return {
-      dialog: false,
+      alert: false,
+      calculationDialog: false,
+      positionDialog: false,
+
+      validations: {
+        title: {
+          required
+        }
+      },
+
+      title: "",
       balance: 200000,
       broker: "overseas",
       leverage: {
@@ -471,7 +507,7 @@ export default {
     editPosition(item) {
       this.editedIndex = this.positions.indexOf(item);
       this.editedPosition = Object.assign({}, item);
-      this.dialog = true;
+      this.positionDialog = true;
     },
     deletePosition(item) {
       const index = this.positions.indexOf(item);
@@ -479,7 +515,7 @@ export default {
         this.positions.splice(index, 1);
     },
     close() {
-      this.dialog = false;
+      this.positionDialog = false;
       setTimeout(() => {
         this.editedPosition = Object.assign({}, this.defaultPosition);
         this.editedIndex = -1;
@@ -494,44 +530,33 @@ export default {
       this.close();
     },
     saveCalculation() {
+      const dt = new Date();
+      const date = `${dt.getFullYear()}/${dt.getMonth() + 1}/${dt.getDate()}`;
+
       firebase
         .database()
         .ref("calculations/" + this.$store.state.user.uid)
         .push({
-          id: "agMqXrnErNfVOtZD",
-          title: "テスト2",
-          date: "2019/05/30",
-          balance: 300000,
-          broker: "japan",
-          leverageIndex: 0,
-          targetMarginLevel: 2000,
+          id: Math.random()
+            .toString(36)
+            .slice(-8),
+          title: this.title,
+          date,
+          balance: this.balance,
+          broker: this.broker,
+          leverage: this.leverage[this.broker],
+          targetMarginLevel: this.targetMarginLevel,
           rateExpected: {
-            EURUSD: 1.1156,
-            USDJPY: 109.278,
-            GBPUSD: 1.26449,
-            AUDUSD: 0.69223
+            EURUSD: pairs[0].rateExpected,
+            USDJPY: pairs[1].rateExpected,
+            GBPUSD: pairs[2].rateExpected,
+            AUDUSD: pairs[3].rateExpected
           },
-          positions: [
-            {
-              pair: "USDJPY",
-              action: "buy",
-              lot: 0.01,
-              entryRate: 109.378
-            },
-            {
-              pair: "EURUSD",
-              action: "buy",
-              lot: 0.01,
-              entryRate: 1.2156
-            },
-            {
-              pair: "GBPUSD",
-              action: "buy",
-              lot: 0.01,
-              entryRate: 1.27449
-            }
-          ]
+          positions: this.positions
         });
+
+      this.calculationDialog = false;
+      this.alert = true;
     }
   },
   filters: {
