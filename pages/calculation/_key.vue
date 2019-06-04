@@ -18,7 +18,16 @@
 
           <v-card-text>
             <ul>
-              <li v-for="(value, name) in calculationViewed">{{ name }}: {{ value }}</li>
+              <li>残高 {{ calculationViewed.balance | withDelimiter }} 円</li>
+              <li>ブローカー {{ calculationViewed.broker }}</li>
+              <li>レバレッジ {{ calculationViewed.leverage | withDelimiter }}</li>
+              <li>
+                仮定レート
+                <ul>
+                  <li v-for="(value, key) in calculationViewed.rateExpected">{{ key }}: {{ value }}</li>
+                </ul>
+              </li>
+              <li>ターゲット {{ calculationViewed.targetMarginLevel | withDelimiter }} ％</li>
             </ul>
           </v-card-text>
 

@@ -581,11 +581,6 @@ export default {
       this.alert = true;
     }
   },
-  filters: {
-    withDelimiter: function(value) {
-      return value.toLocaleString();
-    }
-  },
   mounted() {
     const self = this;
 
