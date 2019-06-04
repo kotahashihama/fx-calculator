@@ -2,15 +2,6 @@
   <v-container grid-list-lg>
     <v-layout column>
       <v-flex xs12>
-        <v-alert
-          :value="alert"
-          dismissible
-          type="success"
-          transition="scale-transition"
-        >計算結果を削除しました！</v-alert>
-      </v-flex>
-
-      <v-flex xs12>
         <template v-if="$store.state.isWaiting">
           <p>読み込み中...</p>
         </template>

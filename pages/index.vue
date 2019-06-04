@@ -71,7 +71,7 @@
               <template v-else>
                 <v-card-actions>
                   <v-btn flat color="primary" @click="getOpenTrades">取得</v-btn>
-                  <v-btn flat>ログアウト</v-btn>
+                  <v-btn flat @click="logoutMyfxbook">ログアウト</v-btn>
                 </v-card-actions>
               </template>
             </v-card>
@@ -89,7 +89,7 @@
 
               <v-card-text>
                 <ul>
-                  <li>利益 {{ unrealizedValue | withDelimiter }} 円</li>
+                  <li>含み損益 {{ unrealizedValue | withDelimiter }} 円</li>
                   <li>残高 {{ balance | withDelimiter }} 円</li>
                   <li>ピップス {{ pips }} pips</li>
                   <li>有効証拠金 {{ equity | withDelimiter }} 円</li>
@@ -423,7 +423,7 @@ export default {
     }
   },
   methods: {
-    setEntryRate: function() {
+    setEntryRate() {
       const pair = this.editedPosition.pair;
       const pairInfo = this.pairs.find(function(pairInfo) {
         return pairInfo.name === pair;
@@ -431,7 +431,7 @@ export default {
 
       this.editedPosition.entryRate = pairInfo.rate;
     },
-    getCurrentRates: function() {
+    getCurrentRates() {
       for (let i = 0; i < this.pairs.length; i++) {
         const pair = this.pairs[i].name;
         const keyCurrency = this.pairs[i].name.slice(0, 3);
@@ -460,7 +460,7 @@ export default {
           Math.round((1 / this.pairsFromAPI[keyCurrency]) * 100000) / 100000;
       }
     },
-    loginMyfxbook: function() {
+    loginMyfxbook() {
       const self = this;
       const params = {
         email: this.myfxbook.email,
@@ -481,7 +481,11 @@ export default {
           }
         });
     },
-    getOpenTrades: function() {
+    logoutMyfxbook() {
+      this.myfxbook.session = "";
+      alert("Myfxbookをログアウトしました");
+    },
+    getOpenTrades() {
       const self = this;
       const params = {
         session: this.myfxbook.session,
@@ -582,7 +586,7 @@ export default {
       return value.toLocaleString();
     }
   },
-  mounted: function() {
+  mounted() {
     const self = this;
 
     axios
