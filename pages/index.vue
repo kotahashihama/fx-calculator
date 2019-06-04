@@ -21,6 +21,7 @@
           </template>
           <template v-else>
             <p>{{ $store.state.user.displayName }}でログイン中</p>
+            <v-btn @click="$store.commit('logOut')">ログアウト</v-btn>
             <v-dialog v-model="calculationDialog" max-width="500px">
               <template v-slot:activator="{ on }">
                 <v-btn v-on="on" color="primary">計算結果を保存</v-btn>
@@ -37,8 +38,44 @@
                 </v-form>
               </v-card>
             </v-dialog>
-            <v-btn @click="$store.commit('logOut')">ログアウト</v-btn>
           </template>
+
+          <v-dialog v-model="myfxbookDialog" max-width="500px">
+            <template v-slot:activator="{ on }">
+              <v-btn v-on="on" color="primary">ポジション取得</v-btn>
+            </template>
+            <v-card>
+              <v-card-title>
+                <span class="headline">Myfxbookにログイン</span>
+              </v-card-title>
+
+              <template v-if="myfxbook.session <= 0">
+                <v-card-text>
+                  <v-text-field v-model="myfxbook.email" label="メールアドレス"></v-text-field>
+                  <v-text-field v-model="myfxbook.password" label="パスワード"></v-text-field>
+                </v-card-text>
+              </template>
+              <template v-else>
+                <v-card-text>
+                  <p>{{ myfxbook.email }}としてログイン中</p>
+                  <p>ポジションを取得する口座番号を入力してください。</p>
+                  <v-text-field v-model="myfxbook.accountNumber" label="Myfxbook口座番号"></v-text-field>
+                </v-card-text>
+              </template>
+
+              <template v-if="myfxbook.session <= 0">
+                <v-card-actions>
+                  <v-btn flat color="primary" @click="loginMyfxbook">ログイン</v-btn>
+                </v-card-actions>
+              </template>
+              <template v-else>
+                <v-card-actions>
+                  <v-btn flat color="primary" @click="getOpenTrades">取得</v-btn>
+                  <v-btn flat>ログアウト</v-btn>
+                </v-card-actions>
+              </template>
+            </v-card>
+          </v-dialog>
         </template>
       </v-flex>
 
@@ -52,6 +89,7 @@
 
               <v-card-text>
                 <ul>
+                  <li>利益 {{ unrealizedValue | withDelimiter }} 円</li>
                   <li>残高 {{ balance | withDelimiter }} 円</li>
                   <li>ピップス {{ pips }} pips</li>
                   <li>有効証拠金 {{ equity | withDelimiter }} 円</li>
@@ -128,27 +166,6 @@
               </v-data-table>
             </v-card>
           </v-flex>
-
-          <v-flex>
-            <v-card>
-              <v-card-title>
-                <span class="headline">ポジション取得（Myfxbook）</span>
-              </v-card-title>
-
-              <v-card-text>
-                <template v-if="myfxbook.session <= 0">
-                  <v-text-field v-model="myfxbook.email" label="メールアドレス"></v-text-field>
-                  <v-text-field v-model="myfxbook.password" label="パスワード"></v-text-field>
-                  <v-btn color="primary" @click="loginMyfxbook">ログイン</v-btn>
-                </template>
-                <template v-else>
-                  <p>{{ myfxbook.email }}としてログイン中</p>
-                  <v-text-field v-model="myfxbook.accountNumber" label="Myfxbook口座番号"></v-text-field>
-                  <v-btn color="primary" @click="getOpenTrades">取得</v-btn>
-                </template>
-              </v-card-text>
-            </v-card>
-          </v-flex>
         </v-layout>
       </v-flex>
 
@@ -211,6 +228,7 @@ export default {
     return {
       alert: false,
       calculationDialog: false,
+      myfxbookDialog: false,
       positionDialog: false,
 
       validations: {
@@ -456,7 +474,6 @@ export default {
         .then(function(response) {
           if (response.data.error === false) {
             self.myfxbook.session = response.data.session;
-            self.getOpenTrades();
           } else {
             alert(
               "ログインできませんでした。メールアドレスとパスワードをもう一度お試しください"
@@ -493,6 +510,8 @@ export default {
             alert("取得できませんでした。時間をおいてお試しください");
           }
         });
+
+      this.myfxbookDialog = false;
     },
     editPosition(item) {
       this.editedIndex = this.positions.indexOf(item);

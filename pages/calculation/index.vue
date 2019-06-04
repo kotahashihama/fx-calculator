@@ -21,8 +21,8 @@
           </template>
           <template v-else>
             <p>{{ $store.state.user.displayName }}でログイン中</p>
-            <v-btn @click="$router.push({ path: `/`})" color="primary">計算する</v-btn>
             <v-btn @click="$store.commit('logOut')">ログアウト</v-btn>
+            <v-btn @click="$router.push({ path: `/`})" color="primary">計算する</v-btn>
           </template>
         </template>
       </v-flex>
