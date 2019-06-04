@@ -22,14 +22,14 @@
           <v-flex>
             <v-card>
               <v-list>
-                <template v-for="(calculation, index) in calculations">
+                <div v-for="(calculation, index) in calculations" :key="calculation.key">
                   <v-list-tile @click="$router.push({ path: `/calculation/${calculation.key}` })">
                     <v-list-tile-content>
                       <v-list-tile-title>{{ calculation.title }}</v-list-tile-title>
                       <v-list-tile-sub-title>{{ calculation.date }}</v-list-tile-sub-title>
                     </v-list-tile-content>
                   </v-list-tile>
-                </template>
+                </div>
               </v-list>
             </v-card>
           </v-flex>

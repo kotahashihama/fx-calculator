@@ -37,7 +37,7 @@
                     </v-card-text>
                     <v-card-actions>
                       <v-btn color="blue darken-1" flat @click="calculationDialog = false">キャンセル</v-btn>
-                      <v-btn color="blue darken-1" flat @click="saveCalculation()">保存</v-btn>
+                      <v-btn color="blue darken-1" flat @click="saveCalculation">保存</v-btn>
                     </v-card-actions>
                   </v-form>
                 </v-card>
@@ -113,8 +113,8 @@
 
                     <v-card-actions>
                       <v-spacer></v-spacer>
-                      <v-btn color="blue darken-1" flat @click="close">キャンセル</v-btn>
-                      <v-btn color="blue darken-1" flat @click="save">追加</v-btn>
+                      <v-btn color="blue darken-1" flat @click="closePositionDialog">キャンセル</v-btn>
+                      <v-btn color="blue darken-1" flat @click="savePosition">追加</v-btn>
                     </v-card-actions>
                   </v-card>
                 </v-dialog>
@@ -244,10 +244,7 @@ export default {
       },
 
       positionHeaders: [
-        {
-          text: "通貨ペア",
-          value: "pair"
-        },
+        { text: "通貨ペア", value: "pair" },
         { text: "売買", value: "action" },
         { text: "ロット", value: "lot" },
         { text: "レート", value: "entryRate" },
@@ -410,7 +407,7 @@ export default {
   },
   watch: {
     dialog(val) {
-      val || this.close();
+      val || this.closePositionDialog();
     }
   },
   methods: {
@@ -513,20 +510,20 @@ export default {
       confirm("本当に削除してもよろしいですか？") &&
         this.positions.splice(index, 1);
     },
-    close() {
+    closePositionDialog() {
       this.positionDialog = false;
       setTimeout(() => {
         this.editedPosition = Object.assign({}, this.defaultPosition);
         this.editedIndex = -1;
       }, 300);
     },
-    save() {
+    savePosition() {
       if (this.editedIndex > -1) {
         Object.assign(this.positions[this.editedIndex], this.editedPosition);
       } else {
         this.positions.push(this.editedPosition);
       }
-      this.close();
+      this.closePositionDialog();
     },
     saveCalculation() {
       const dt = new Date();

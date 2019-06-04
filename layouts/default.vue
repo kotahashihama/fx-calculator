@@ -51,7 +51,6 @@ export default {
     return {
       clipped: false,
       drawer: false,
-      fixed: false,
       items: [
         {
           icon: "computer",
@@ -64,19 +63,12 @@ export default {
           to: "/calculation"
         },
         {
-          icon: "settings",
-          title: "設定",
-          to: "/settings"
-        },
-        {
           icon: "help",
           title: "このアプリについて",
           to: "/about"
         }
       ],
       miniVariant: false,
-      right: true,
-      rightDrawer: false,
       title: "ポジション計算機"
     };
   },
