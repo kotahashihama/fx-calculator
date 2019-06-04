@@ -1,7 +1,13 @@
 <template>
-  <v-container>
-    <v-layout>
-      <v-flex>
+  <v-container grid-list-lg>
+    <v-layout column>
+      <v-flex xs12>
+        <div>
+          <v-btn @click="$router.push({ path: '/calculation' })">一覧へ戻る</v-btn>
+        </div>
+      </v-flex>
+
+      <v-flex xs12>
         <v-card>
           <v-card-title primary-title>
             <div>

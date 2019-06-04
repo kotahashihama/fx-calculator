@@ -12,38 +12,32 @@
 
       <v-flex xs12>
         <template v-if="$store.state.isWaiting">
-          <v-flex>
-            <p>読み込み中...</p>
-          </v-flex>
+          <p>読み込み中...</p>
         </template>
         <template v-else>
           <template v-if="!$store.state.isLogin">
-            <v-flex>
-              <p>保存機能を使うにはログインが必要です。</p>
-              <v-btn @click="$store.commit('twitterLogin')" color="primary">Twitterでログイン</v-btn>
-            </v-flex>
+            <p>保存機能を使うにはログインが必要です。</p>
+            <v-btn @click="$store.commit('twitterLogin')" color="primary">Twitterでログイン</v-btn>
           </template>
           <template v-else>
-            <v-flex>
-              <p>{{ $store.state.user.displayName }}でログイン中</p>
-              <v-dialog v-model="calculationDialog" max-width="500px">
-                <template v-slot:activator="{ on }">
-                  <v-btn v-on="on" color="primary">計算結果を保存</v-btn>
-                </template>
-                <v-card>
-                  <v-form>
-                    <v-card-text>
-                      <v-text-field v-model="title" label="タイトル" required></v-text-field>
-                    </v-card-text>
-                    <v-card-actions>
-                      <v-btn color="blue darken-1" flat @click="calculationDialog = false">キャンセル</v-btn>
-                      <v-btn color="blue darken-1" flat @click="saveCalculation">保存</v-btn>
-                    </v-card-actions>
-                  </v-form>
-                </v-card>
-              </v-dialog>
-              <v-btn @click="$store.commit('logOut')">ログアウト</v-btn>
-            </v-flex>
+            <p>{{ $store.state.user.displayName }}でログイン中</p>
+            <v-dialog v-model="calculationDialog" max-width="500px">
+              <template v-slot:activator="{ on }">
+                <v-btn v-on="on" color="primary">計算結果を保存</v-btn>
+              </template>
+              <v-card>
+                <v-form>
+                  <v-card-text>
+                    <v-text-field v-model="title" label="タイトル" required></v-text-field>
+                  </v-card-text>
+                  <v-card-actions>
+                    <v-btn color="blue darken-1" flat @click="calculationDialog = false">キャンセル</v-btn>
+                    <v-btn color="blue darken-1" flat @click="saveCalculation">保存</v-btn>
+                  </v-card-actions>
+                </v-form>
+              </v-card>
+            </v-dialog>
+            <v-btn @click="$store.commit('logOut')">ログアウト</v-btn>
           </template>
         </template>
       </v-flex>
