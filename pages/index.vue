@@ -58,7 +58,7 @@
 
           <v-dialog v-model="myfxbookDialog" max-width="500px">
             <template v-slot:activator="{ on }">
-              <v-btn v-on="on" color="primary">ポジション取得</v-btn>
+              <v-btn v-on="on" @click="completeMyfxbookInfo" color="primary">ポジション取得</v-btn>
             </template>
             <v-card>
               <v-card-title>
@@ -235,7 +235,7 @@
           </v-layout>
         </div>
       </v-flex>
-      <pre>{{ $data }}</pre>
+      <!-- <pre>{{ $data }}</pre> -->
     </v-layout>
   </v-container>
 </template>
@@ -522,6 +522,18 @@ export default {
         .then(function(response) {
           if (response.data.error === false) {
             self.myfxbook.session = response.data.session;
+
+            if (self.$store.state.isLogin) {
+              firebase
+                .database()
+                .ref("users/" + self.$store.state.user.uid)
+                .child("myfxbook")
+                .update({
+                  email: self.myfxbook.email,
+                  password: self.myfxbook.password,
+                  session: self.myfxbook.session
+                });
+            }
           } else {
             alert(
               "ログインできませんでした。メールアドレスとパスワードをもう一度お試しください"
@@ -559,7 +571,9 @@ export default {
               });
             }
           } else {
-            alert("取得できませんでした。時間をおいてお試しください");
+            alert(
+              "取得できませんでした。時間をおくか、再度ログインしてお試しください"
+            );
           }
         });
 
@@ -726,9 +740,20 @@ export default {
       this.$store.commit("editingOff");
 
       this.newCalculationDialog = false;
+    },
+    completeMyfxbookInfo() {
+      firebase
+        .database()
+        .ref("users/" + this.$store.state.user.uid + "/myfxbook")
+        .once("value")
+        .then(result => {
+          this.myfxbook.email = result.child("email").val();
+          this.myfxbook.session = result.child("session").val();
+        });
     }
   },
   mounted() {
+    this.$store.dispatch("checkAuthentication");
     this.initialize();
   }
 };
