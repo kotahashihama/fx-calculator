@@ -235,7 +235,7 @@
           </v-layout>
         </div>
       </v-flex>
-      <!-- {{ $data }} -->
+      <pre>{{ $data }}</pre>
     </v-layout>
   </v-container>
 </template>
@@ -451,7 +451,7 @@ export default {
       if (this.positions.length) {
         return Math.round((this.equity / this.necessaryMargin) * 10000) / 100;
       } else {
-        return this.equity;
+        return 0;
       }
     },
     balanceGap() {
