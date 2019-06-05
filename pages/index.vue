@@ -94,7 +94,7 @@
             </v-card>
           </v-dialog>
 
-          <v-dialog v-model="newCalculationDialog" max-width="500px">
+          <v-dialog v-model="resetCalculationDialog" max-width="500px">
             <template v-slot:activator="{ on }">
               <v-btn color="error" v-on="on" v-if="$store.state.editing">リセット</v-btn>
             </template>
@@ -102,7 +102,7 @@
               <v-card-text>今までの変更が破棄されます。よろしいですか？</v-card-text>
 
               <v-card-actions>
-                <v-btn flat @click="newCalculationDialog = false">キャンセル</v-btn>
+                <v-btn flat @click="resetCalculationDialog = false">キャンセル</v-btn>
                 <v-btn flat color="red" @click="resetCalculation">OK</v-btn>
               </v-card-actions>
             </v-card>
@@ -276,6 +276,7 @@ export default {
       calculationDialog: false,
       myfxbookDialog: false,
       newCalculationDialog: false,
+      resetCalculationDialog: false,
       positionDialog: false,
 
       validations: {
@@ -711,6 +712,7 @@ export default {
 
       this.initialize();
 
+      this.resetCalculationDialog = false;
       this.resetAlert = true;
     },
     newCalculation() {
@@ -722,6 +724,8 @@ export default {
       this.positions = [];
 
       this.$store.commit("editingOff");
+
+      this.newCalculationDialog = false;
     }
   },
   mounted() {
