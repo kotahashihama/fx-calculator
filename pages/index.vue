@@ -87,8 +87,9 @@
               </template>
               <template v-else>
                 <v-card-actions>
-                  <v-btn flat color="primary" @click="getOpenTrades">取得</v-btn>
+                  <v-btn flat @click="myfxbookDialog = false">キャンセル</v-btn>
                   <v-btn flat @click="logoutMyfxbook">ログアウト</v-btn>
+                  <v-btn flat color="primary" @click="getOpenTrades">取得</v-btn>
                 </v-card-actions>
               </template>
             </v-card>
@@ -755,7 +756,8 @@ export default {
   mounted() {
     this.$store.dispatch("checkAuthentication");
     this.initialize();
-  }
+  },
+  updated() {}
 };
 </script>
 
