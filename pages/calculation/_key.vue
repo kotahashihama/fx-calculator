@@ -32,7 +32,7 @@
           </v-card-text>
 
           <v-card-actions>
-            <v-btn flat>編集</v-btn>
+            <v-btn flat @click="editCalculation">編集</v-btn>
             <v-dialog v-model="dialog" max-width="500px">
               <template v-slot:activator="{ on }">
                 <v-btn flat color="red" v-on="on">削除</v-btn>
@@ -95,7 +95,13 @@ export default {
         .child(this.calculationViewed.key)
         .remove();
 
-      this.$router.push({ path: `/calculation` });
+      this.$router.push({ path: "/calculation" });
+    },
+    editCalculation() {
+      this.$store.commit("editingOn");
+      this.$store.commit("reflectCalculation", this.calculationViewed);
+
+      this.$router.push({ path: "/" });
     }
   }
 };

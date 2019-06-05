@@ -3,11 +3,18 @@
     <v-layout row wrap>
       <v-flex xs12>
         <v-alert
-          :value="alert"
+          :value="saveAlert"
           dismissible
           type="success"
           transition="scale-transition"
         >計算結果を保存しました！</v-alert>
+
+        <v-alert
+          :value="resetAlert"
+          dismissible
+          type="info"
+          transition="scale-transition"
+        >計算結果をリセットしました。</v-alert>
       </v-flex>
 
       <v-flex xs12>
@@ -20,7 +27,8 @@
             <v-btn @click="$store.commit('twitterLogin')" color="primary">Twitterでログイン</v-btn>
           </template>
           <template v-else>
-            <p>{{ $store.state.user.displayName }}でログイン中</p>
+            <p>{{ $store.state.user.displayName }}でログイン済み</p>
+            <p v-if="$store.state.editing">「{{ $store.state.calculationEditing.title }}」を編集中</p>
             <v-btn @click="$store.commit('logOut')">ログアウト</v-btn>
             <v-dialog v-model="calculationDialog" max-width="500px">
               <template v-slot:activator="{ on }">
@@ -32,8 +40,16 @@
                     <v-text-field v-model="title" label="タイトル" required></v-text-field>
                   </v-card-text>
                   <v-card-actions>
-                    <v-btn color="blue darken-1" flat @click="calculationDialog = false">キャンセル</v-btn>
-                    <v-btn color="blue darken-1" flat @click="saveCalculation">保存</v-btn>
+                    <v-btn flat @click="calculationDialog = false">キャンセル</v-btn>
+                    <v-btn
+                      color="blue"
+                      flat
+                      @click="overrideCalculation"
+                      v-if="$store.state.editing"
+                    >上書き保存</v-btn>
+                    <v-btn color="blue" flat @click="saveCalculation">
+                      <span v-if="$store.state.editing">別名で</span>保存
+                    </v-btn>
                   </v-card-actions>
                 </v-form>
               </v-card>
@@ -51,15 +67,16 @@
 
               <template v-if="myfxbook.session <= 0">
                 <v-card-text>
+                  <p>Myfxbookから簡単にポジションを入力できます。</p>
                   <v-text-field v-model="myfxbook.email" label="メールアドレス"></v-text-field>
                   <v-text-field v-model="myfxbook.password" label="パスワード"></v-text-field>
                 </v-card-text>
               </template>
               <template v-else>
                 <v-card-text>
-                  <p>{{ myfxbook.email }}としてログイン中</p>
+                  <p>{{ myfxbook.email }}としてログイン済み</p>
                   <p>ポジションを取得する口座番号を入力してください。</p>
-                  <v-text-field v-model="myfxbook.accountNumber" label="Myfxbook口座番号"></v-text-field>
+                  <v-text-field v-model.number="myfxbook.accountNumber" label="Myfxbook口座番号"></v-text-field>
                 </v-card-text>
               </template>
 
@@ -74,6 +91,34 @@
                   <v-btn flat @click="logoutMyfxbook">ログアウト</v-btn>
                 </v-card-actions>
               </template>
+            </v-card>
+          </v-dialog>
+
+          <v-dialog v-model="newCalculationDialog" max-width="500px">
+            <template v-slot:activator="{ on }">
+              <v-btn color="error" v-on="on" v-if="$store.state.editing">リセット</v-btn>
+            </template>
+            <v-card>
+              <v-card-text>今までの変更が破棄されます。よろしいですか？</v-card-text>
+
+              <v-card-actions>
+                <v-btn flat @click="newCalculationDialog = false">キャンセル</v-btn>
+                <v-btn flat color="red" @click="resetCalculation">OK</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+
+          <v-dialog v-model="newCalculationDialog" max-width="500px">
+            <template v-slot:activator="{ on }">
+              <v-btn color="success darken-2" v-on="on" v-if="$store.state.editing">新しく計算する</v-btn>
+            </template>
+            <v-card>
+              <v-card-text>今までの変更が破棄されます。よろしいですか？</v-card-text>
+
+              <v-card-actions>
+                <v-btn flat @click="newCalculationDialog = false">キャンセル</v-btn>
+                <v-btn flat color="red" @click="newCalculation">OK</v-btn>
+              </v-card-actions>
             </v-card>
           </v-dialog>
         </template>
@@ -134,10 +179,10 @@
                             </v-radio-group>
                           </v-flex>
                           <v-flex xs12 sm6>
-                            <v-text-field v-model="editedPosition.lot" label="ロット"></v-text-field>
+                            <v-text-field v-model.number="editedPosition.lot" label="ロット"></v-text-field>
                           </v-flex>
                           <v-flex xs12 sm6>
-                            <v-text-field v-model="editedPosition.entryRate" label="レート"></v-text-field>
+                            <v-text-field v-model.number="editedPosition.entryRate" label="レート"></v-text-field>
                           </v-flex>
                         </v-layout>
                       </v-container>
@@ -226,9 +271,11 @@ const pairs = [
 export default {
   data() {
     return {
-      alert: false,
+      saveAlert: false,
+      resetAlert: false,
       calculationDialog: false,
       myfxbookDialog: false,
+      newCalculationDialog: false,
       positionDialog: false,
 
       validations: {
@@ -578,22 +625,107 @@ export default {
         .update(newCalculation);
 
       this.calculationDialog = false;
-      this.alert = true;
+      this.saveAlert = true;
+    },
+    overrideCalculation() {
+      const key = this.$store.state.calculationEditing.key;
+
+      const calculationEdited = {
+        title: this.title,
+        balance: this.balance,
+        broker: this.broker,
+        leverage: this.leverage[this.broker],
+        targetMarginLevel: this.targetMarginLevel,
+        rateExpected: {
+          EURUSD: pairs[0].rateExpected,
+          USDJPY: pairs[1].rateExpected,
+          GBPUSD: pairs[2].rateExpected,
+          AUDUSD: pairs[3].rateExpected
+        },
+        positions: this.positions
+      };
+
+      if (calculationEdited.title === "") {
+        calculationEdited.title = "無題";
+      }
+
+      firebase
+        .database()
+        .ref("calculations/" + this.$store.state.user.uid)
+        .child(key)
+        .update(calculationEdited);
+
+      this.calculationDialog = false;
+      this.saveAlert = true;
+    },
+    initialize() {
+      const calculationEditing = this.$store.state.calculationEditing;
+
+      if (this.$store.state.editing) {
+        this.title = calculationEditing.title;
+        this.balance = calculationEditing.balance;
+        this.broker = calculationEditing.broker;
+        this.leverage[this.broker] = calculationEditing.leverage;
+        this.targetMarginLevel = calculationEditing.targetMarginLevel;
+        this.pairs[0].rateExpected = calculationEditing.rateExpected.EURUSD;
+        this.pairs[1].rateExpected = calculationEditing.rateExpected.USDJPY;
+        this.pairs[2].rateExpected = calculationEditing.rateExpected.GBPUSD;
+        this.pairs[3].rateExpected = calculationEditing.rateExpected.AUDUSD;
+        this.positions = calculationEditing.positions || [];
+
+        const self = this;
+
+        axios
+          .get("https://api.ratesapi.io/api/latest?base=USD")
+          .then(function(response) {
+            self.pairsFromAPI = response.data.rates;
+            self.defaultPosition.entryRate =
+              Math.round((1 / self.pairsFromAPI["EUR"]) * 100000) / 100000;
+            self.editedPosition.entryRate =
+              Math.round((1 / self.pairsFromAPI["EUR"]) * 100000) / 100000;
+          });
+      } else {
+        const self = this;
+
+        axios
+          .get("https://api.ratesapi.io/api/latest?base=USD")
+          .then(function(response) {
+            self.pairsFromAPI = response.data.rates;
+            self.getCurrentRates();
+            self.defaultPosition.entryRate =
+              Math.round((1 / self.pairsFromAPI["EUR"]) * 100000) / 100000;
+            self.editedPosition.entryRate =
+              Math.round((1 / self.pairsFromAPI["EUR"]) * 100000) / 100000;
+          });
+      }
+    },
+    resetCalculation() {
+      if (!this.$store.state.editing) {
+        this.title = "";
+        this.balance = 200000;
+        this.broker = "overseas";
+        this.leverage[this.broker] = 1000;
+        this.targetMarginLevel = 1000;
+        this.positions = [];
+      }
+
+      this.initialize();
+
+      this.resetAlert = true;
+    },
+    newCalculation() {
+      this.title = "";
+      this.balance = 200000;
+      this.broker = "overseas";
+      this.leverage[this.broker] = 1000;
+      this.targetMarginLevel = 1000;
+      this.positions = [];
+
+      this.$store.commit("editingOff");
     }
   },
   mounted() {
-    const self = this;
-
-    axios
-      .get("https://api.ratesapi.io/api/latest?base=USD")
-      .then(function(response) {
-        self.pairsFromAPI = response.data.rates;
-        self.getCurrentRates();
-        self.defaultPosition.entryRate =
-          Math.round((1 / self.pairsFromAPI["EUR"]) * 100000) / 100000;
-        self.editedPosition.entryRate =
-          Math.round((1 / self.pairsFromAPI["EUR"]) * 100000) / 100000;
-      });
+    this.initialize();
   }
 };
 </script>

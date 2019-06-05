@@ -11,7 +11,7 @@
             <v-btn @click="$store.commit('twitterLogin')" color="primary">Twitterでログイン</v-btn>
           </template>
           <template v-else>
-            <p>{{ $store.state.user.displayName }}でログイン中</p>
+            <p>{{ $store.state.user.displayName }}でログイン済み</p>
             <v-btn @click="$store.commit('logOut')">ログアウト</v-btn>
             <v-btn @click="$router.push({ path: `/`})" color="primary">計算する</v-btn>
           </template>

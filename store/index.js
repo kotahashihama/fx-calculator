@@ -3,7 +3,10 @@ import firebase from "@/plugins/firebase";
 export const state = () => ({
   isWaiting: true,
   isLogin: false,
-  user: []
+  user: [],
+
+  editing: false,
+  calculationEditing: {}
 });
 
 export const mutations = {
@@ -25,6 +28,16 @@ export const mutations = {
   notLoginMutation(state) {
     state.isLogin = false;
     state.user = [];
+  },
+
+  editingOn(state) {
+    state.editing = true;
+  },
+  editingOff(state) {
+    state.editing = false;
+  },
+  reflectCalculation(state, calculationEditing) {
+    state.calculationEditing = calculationEditing;
   }
 };
 
