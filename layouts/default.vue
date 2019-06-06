@@ -38,7 +38,7 @@
       app
       :class="[this.$store.state.unrealizedValue < 0 ? 'toolbar--red' : 'toolbar--blue']"
     >
-      <v-toolbar-side-icon @click="drawer = !drawer"/>
+      <v-toolbar-side-icon @click="drawer = !drawer" class="icon--white"/>
       <v-toolbar-title v-text="title"/>
       <v-spacer/>
     </v-toolbar>
@@ -86,9 +86,15 @@ export default {
 <style lang="scss" scoped>
 .toolbar--red {
   background: #f84444 !important;
+  color: #fff !important;
 }
 
 .toolbar--blue {
   background: #007aff !important;
+  color: #fff !important;
+}
+
+.icon--white {
+  color: #fff !important;
 }
 </style>
