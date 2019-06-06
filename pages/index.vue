@@ -332,6 +332,7 @@ export default {
         entryRate: 0
       },
       editedIndex: -1,
+      calculationSavedLength: 0,
 
       pairs,
       pairsFromAPI: null,
@@ -644,14 +645,20 @@ export default {
         newCalculation.title = "無題";
       }
 
-      firebase
-        .database()
-        .ref("calculations/" + this.$store.state.user.uid)
-        .child(key)
-        .update(newCalculation);
+      if (this.calculationSavedLength < 3) {
+        firebase
+          .database()
+          .ref("calculations/" + this.$store.state.user.uid)
+          .child(key)
+          .update(newCalculation);
 
+        this.saveAlert = true;
+      } else {
+        alert("保存できる計算結果は3つまでです。");
+      }
+
+      this.getCalculationSavedLength();
       this.calculationDialog = false;
-      this.saveAlert = true;
     },
     overrideCalculation() {
       const key = this.$store.state.calculationEditing.key;
@@ -697,8 +704,9 @@ export default {
         this.pairs[1].rateExpected = calculationEditing.rateExpected.USDJPY;
         this.pairs[2].rateExpected = calculationEditing.rateExpected.GBPUSD;
         this.pairs[3].rateExpected = calculationEditing.rateExpected.AUDUSD;
-        this.positions =
-          JSON.parse(JSON.stringify(calculationEditing.positions)) || [];
+        this.positions = JSON.parse(
+          JSON.stringify(calculationEditing.positions || [])
+        );
 
         const self = this;
 
@@ -761,6 +769,17 @@ export default {
         .then(result => {
           this.myfxbook.email = result.child("email").val();
           this.myfxbook.session = result.child("session").val();
+        });
+
+      this.getCalculationSavedLength();
+    },
+    getCalculationSavedLength() {
+      firebase
+        .database()
+        .ref("calculations/" + this.$store.state.user.uid)
+        .once("value")
+        .then(result => {
+          this.calculationSavedLength = Object.keys(result.val()).length;
         });
     }
   },
