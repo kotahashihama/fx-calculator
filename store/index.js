@@ -6,7 +6,8 @@ export const state = () => ({
   user: [],
 
   editing: false,
-  calculationEditing: {}
+  calculationEditing: {},
+  unrealizedValue: 0
 });
 
 export const mutations = {
@@ -38,6 +39,13 @@ export const mutations = {
   },
   reflectCalculation(state, calculationEditing) {
     state.calculationEditing = calculationEditing;
+  },
+
+  checkUnrealizedValue(state, unrealizedValue) {
+    state.unrealizedValue = unrealizedValue;
+  },
+  resetUnrealizedValue(state) {
+    state.unrealizedValue = 0;
   }
 };
 

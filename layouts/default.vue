@@ -32,7 +32,12 @@
         </v-list-tile>
       </v-list>
     </v-navigation-drawer>
-    <v-toolbar :clipped-left="clipped" fixed app>
+    <v-toolbar
+      :clipped-left="clipped"
+      fixed
+      app
+      :class="[this.$store.state.unrealizedValue < 0 ? 'toolbar--red' : 'toolbar--blue']"
+    >
       <v-toolbar-side-icon @click="drawer = !drawer"/>
       <v-toolbar-title v-text="title"/>
       <v-spacer/>
@@ -77,3 +82,13 @@ export default {
   }
 };
 </script>
+
+<style lang="scss" scoped>
+.toolbar--red {
+  background: #f84444 !important;
+}
+
+.toolbar--blue {
+  background: #007aff !important;
+}
+</style>

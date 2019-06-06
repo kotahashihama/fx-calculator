@@ -191,8 +191,8 @@
 
                     <v-card-actions>
                       <v-spacer></v-spacer>
-                      <v-btn color="blue darken-1" flat @click="closePositionDialog">キャンセル</v-btn>
-                      <v-btn color="blue darken-1" flat @click="savePosition">追加</v-btn>
+                      <v-btn flat @click="closePositionDialog">キャンセル</v-btn>
+                      <v-btn color="blue" flat @click="savePosition">追加</v-btn>
                     </v-card-actions>
                   </v-card>
                 </v-dialog>
@@ -467,8 +467,11 @@ export default {
     }
   },
   watch: {
-    dialog(val) {
-      val || this.closePositionDialog();
+    unrealizedValue: {
+      handler() {
+        this.$store.commit("checkUnrealizedValue", this.unrealizedValue);
+      },
+      immediate: true
     }
   },
   methods: {
@@ -756,8 +759,7 @@ export default {
   mounted() {
     this.$store.dispatch("checkAuthentication");
     this.initialize();
-  },
-  updated() {}
+  }
 };
 </script>
 

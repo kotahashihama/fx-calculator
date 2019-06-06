@@ -40,7 +40,8 @@ export default {
   plugins: [
     { src: "@/plugins/vuetify" },
     { src: "@/plugins/vuelidate" },
-    { src: "@/plugins/filters.js" }
+    { src: "@/plugins/filters.js" },
+    { src: "@/plugins/routerOption.js" }
   ],
 
   /*
