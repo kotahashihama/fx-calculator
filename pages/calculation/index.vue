@@ -19,7 +19,7 @@
       </v-flex>
 
       <v-flex xs12>
-        <template v-if="!$store.state.isWaiting">
+        <template v-if="$store.state.isLogin">
           <v-card>
             <v-list>
               <div v-for="(calculation, index) in calculations" :key="calculation.key">

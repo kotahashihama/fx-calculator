@@ -97,7 +97,7 @@
 
           <v-dialog v-model="resetCalculationDialog" max-width="500px">
             <template v-slot:activator="{ on }">
-              <v-btn color="error" v-on="on" v-if="$store.state.editing">リセット</v-btn>
+              <v-btn color="error" v-on="on">リセット</v-btn>
             </template>
             <v-card>
               <v-card-text>今までの変更が破棄されます。よろしいですか？</v-card-text>
