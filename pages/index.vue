@@ -697,7 +697,7 @@ export default {
         this.pairs[1].rateExpected = calculationEditing.rateExpected.USDJPY;
         this.pairs[2].rateExpected = calculationEditing.rateExpected.GBPUSD;
         this.pairs[3].rateExpected = calculationEditing.rateExpected.AUDUSD;
-        this.positions = calculationEditing.positions || [];
+        this.positions = calculationEditing.positions.concat() || [];
 
         const self = this;
 
