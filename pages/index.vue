@@ -235,6 +235,13 @@
             </v-flex>
           </v-layout>
         </div>
+
+        <template v-if="positions.length > 0">
+          <v-text-field v-model.number="targetMarginLevel" label="目標証拠金維持率" suffix="％" required></v-text-field>
+          <p v-show="balanceGap > 0">あと{{ balanceGap | withDelimiter }}円の入金が必要です。</p>
+          <p v-show="balanceGap < 0">あと{{ -balanceGap | withDelimiter }}円の出金が必要です。</p>
+          <p v-show="balanceGap === 0">証拠金維持率は{{ marginLevel | withDelimiter }}％ちょうどです！</p>
+        </template>
       </v-flex>
       <!-- <pre>{{ $data }}</pre> -->
     </v-layout>
