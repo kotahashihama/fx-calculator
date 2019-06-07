@@ -12,3 +12,11 @@
     </v-layout>
   </v-container>
 </template>
+
+<script>
+export default {
+  mounted() {
+    this.$store.commit("deleteAlertOff");
+  }
+};
+</script>

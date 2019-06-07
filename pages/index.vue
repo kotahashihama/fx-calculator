@@ -788,6 +788,7 @@ export default {
   mounted() {
     this.$store.dispatch("checkAuthentication");
     this.initialize();
+    this.$store.commit("deleteAlertOff");
   }
 };
 </script>

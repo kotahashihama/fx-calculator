@@ -88,6 +88,8 @@ export default {
           );
         }
       });
+
+    this.$store.commit("deleteAlertOff");
   },
   methods: {
     deleteCalculation(index) {
@@ -97,6 +99,7 @@ export default {
         .child(this.calculationViewed.key)
         .remove();
 
+      this.$store.commit("deleteAlertOn");
       this.$router.push({ path: "/calculation" });
     },
     editCalculation() {

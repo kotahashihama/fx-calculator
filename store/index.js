@@ -7,7 +7,9 @@ export const state = () => ({
 
   editing: false,
   calculationEditing: {},
-  unrealizedValue: 0
+  unrealizedValue: 0,
+
+  deleteAlert: false
 });
 
 export const mutations = {
@@ -46,6 +48,13 @@ export const mutations = {
   },
   resetUnrealizedValue(state) {
     state.unrealizedValue = 0;
+  },
+
+  deleteAlertOn(state) {
+    state.deleteAlert = true;
+  },
+  deleteAlertOff(state) {
+    state.deleteAlert = false;
   }
 };
 
